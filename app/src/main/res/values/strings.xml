@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Погода</string>
+    <string name="headline">Выберите город:</string>
+    <string name="cloud_image">Картинка небо</string>
+    <string name="today">Сегодня</string>
+    <string-array name="cities">
+        <item>Санкт-Петербург</item>
+        <item>Москва</item>
+        <item>Ростов-на-дону</item>
+        <item>Сочи</item>
+    </string-array>
+    <string name="temp_tab">Темп.°C</string>
+    <string name="wind_tab">Ветер</string>
+    <string name="pressure_tab">Давление</string>
+    <string name="humidity_tab">Влажн.%</string>
+    <string name="show_weather">Узнать погоду</string>
+    <string name="temperature">Температура</string>
+    <string name="wind">Ветер</string>
+    <string name="wind_measure">м/с</string>
+    <string name="pressure">Давление</string>
+    <string name="pressure_measure">мм</string>
+    <string name="humidity">Влажность</string>
+    <string name="humidity_measure">%</string>
+    <string-array name="day_of_week">
+        <item>Воскресенье</item>
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+    </string-array>
+    <string-array name="month">
+        <item>января</item>
+        <item>февраля</item>
+        <item>марта</item>
+        <item>апреля</item>
+        <item>мая</item>
+        <item>июня</item>
+        <item>июля</item>
+        <item>августа</item>
+        <item>сентября</item>
+        <item>октября</item>
+        <item>ноября</item>
+        <item>декабря</item>
+    </string-array>
+    <string name="one_day_string">1 день</string>
+    <string name="seven_days_string">7 дней</string>
+    <string name="options_menu_description">Прогноз погоды на:</string>
+    <string name="error_weather_parcer_null">Ошибка! WeatherParcer дал результат null!</string>
+    <string name="app_contacts">example@mail.ru</string>
+    <string name="nav_support">Поддержка</string>
+    <string name="about_developer">О разработчике</string>
+    <string name="change_background">Изменить картинку фона</string>
+    <string name="nav_feedback">Обратная связь</string>
+    <string name="nav_edit_background">Изменить фон</string>
+    <string name="nav_open_drawer">Открыть боковую панель</string>
+    <string name="nav_close_drawer">Закрыть боковую панель</string>
+    <string name="developer_email">strikalov.aleksandr@yandex.ru</string>
+    <string name="topic_feedback">Тема</string>
+    <string name="text_feedback">Текст</string>
+    <string name="send_feedback">Отправить</string>
+    <string name="after_click_send_feedback">Сообщение отправлено</string>
+</resources>

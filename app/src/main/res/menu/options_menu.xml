@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="@string/options_menu_description" />
+
+    <group
+        android:checkableBehavior="single"
+        app:showAsAction="never">
+
+        <item
+            android:id="@+id/one_day"
+            android:title="@string/one_day_string"
+            android:checked="true"/>
+
+        <item
+            android:id="@+id/seven_days"
+            android:title="@string/seven_days_string"/>
+    </group>
+
+</menu>

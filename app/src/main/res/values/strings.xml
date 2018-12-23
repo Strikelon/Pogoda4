@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Погода</string>
     <string name="headline">Выберите город:</string>
-    <string name="cloud_image">Картинка небо</string>
+    <string name="picture_background">Фон риложения</string>
     <string name="today">Сегодня</string>
     <string-array name="cities">
         <item>Санкт-Петербург</item>
@@ -61,4 +61,19 @@
     <string name="text_feedback">Текст</string>
     <string name="send_feedback">Отправить</string>
     <string name="after_click_send_feedback">Сообщение отправлено</string>
+    <string name="temperature_sensor">Температурный датчик</string>
+    <string name="sensor_null">Датчик отсутствует\n на устройстве</string>
+    <string name="sensor_value_is">Показания датчика:</string>
+    <string name="humidity_sensor">Датчик влажности</string>
+    <string name="temperature_measure">°C</string>
+    <string name="share_for_friends">Рассказать друзьям</string>
+    <string name="chooser">Отправить сообщение через ...</string>
+    <string name="sky">Небо</string>
+    <string name="forest">Лес</string>
+    <string name="desert">Пустыня</string>
+    <string name="christmas">Рождество</string>
+    <string name="sea">Море</string>
+    <string name="mountains">Горы</string>
+    <string name="accept">Подтвердить</string>
+    <string name="picture_updated">Картинка обновлена!</string>
 </resources>

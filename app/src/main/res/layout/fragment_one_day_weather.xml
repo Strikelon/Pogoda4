@@ -6,6 +6,7 @@
     android:layout_marginStart="8dp"
     android:layout_marginTop="16dp"
     android:layout_marginEnd="8dp"
+    android:id="@+id/card_view_one_day"
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="2dp">
 

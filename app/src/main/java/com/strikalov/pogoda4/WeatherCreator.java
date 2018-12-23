@@ -16,7 +16,7 @@ public class WeatherCreator {
 
     private static WeatherCreator instance;
 
-    public static WeatherCreator getInstance() {
+    public static synchronized WeatherCreator getInstance() {
         if (instance == null) {
             instance = new WeatherCreator();
         }

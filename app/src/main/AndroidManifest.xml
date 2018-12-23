@@ -29,14 +29,24 @@
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".AboutDeveloperActivity"
+        <activity
+            android:name=".AboutDeveloperActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".FeedbackActivity"
+        <activity
+            android:name=".FeedbackActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".TemperatureSensorActivity"
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".HumiditySensorActivity"
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

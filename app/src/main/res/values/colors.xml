@@ -3,4 +3,7 @@
     <color name="colorPrimary">#003366</color>
     <color name="colorPrimaryDark">#000066</color>
     <color name="colorAccent">#0000ff</color>
+    <color name="colorCardViewAccent">#FF9999</color>
+    <color name="white">#FFFFFF</color>
+    <color name="darkCyan">#008B8B</color>
 </resources>

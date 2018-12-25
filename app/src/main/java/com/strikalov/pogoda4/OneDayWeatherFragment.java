@@ -1,9 +1,14 @@
 package com.strikalov.pogoda4;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,6 +18,16 @@ import android.widget.TextView;
 public class OneDayWeatherFragment extends Fragment {
 
     private static final String CITY_INDEX = "city_index";
+
+    private String today;
+    private String temperature;
+    private String temperatureForecast;
+    private String pressure;
+    private String wind;
+    private String windForecast;
+    private String pressureForecast;
+    private String humidity;
+    private String humidityForecast;
 
     public static OneDayWeatherFragment newInstance(int city_index){
 
@@ -33,9 +48,17 @@ public class OneDayWeatherFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_one_day_weather, container, false);
 
+        today = getString(R.string.today);
+        temperature = getString(R.string.temperature);
+        wind = getString(R.string.wind);
+        pressure = getString(R.string.pressure);
+        humidity = getString(R.string.humidity);
         String windMeasure = getString(R.string.wind_measure);
         String pressureMeasure = getString(R.string.pressure_measure);
         String humidityMeasure = getString(R.string.humidity_measure);
+
+        CardView cardViewOneDay = view.findViewById(R.id.card_view_one_day);
+        registerForContextMenu(cardViewOneDay);
 
         TextView textTemperature = view.findViewById(R.id.temperature_today);
         TextView textWind = view.findViewById(R.id.wind_today);
@@ -55,10 +78,15 @@ public class OneDayWeatherFragment extends Fragment {
 
         if(weatherToday != null){
 
-            textTemperature.setText(weatherToday.getTemperature());
-            textWind.setText(getForecastString(windMeasure, weatherToday.getWind()));
-            textPressure.setText(getForecastString(pressureMeasure, weatherToday.getPressure()));
-            textHumidity.setText(getForecastString(humidityMeasure, weatherToday.getHumidity()));
+            temperatureForecast = weatherToday.getTemperature();
+            windForecast = getForecastString(windMeasure, weatherToday.getWind());
+            pressureForecast = getForecastString(pressureMeasure, weatherToday.getPressure());
+            humidityForecast = getForecastString(humidityMeasure, weatherToday.getHumidity());
+
+            textTemperature.setText(temperatureForecast);
+            textWind.setText(windForecast);
+            textPressure.setText(pressureForecast);
+            textHumidity.setText(humidityForecast);
 
             imagePressure.setImageResource(R.drawable.barometr);
             imageHumidity.setImageResource(R.drawable.humidity);
@@ -118,5 +146,38 @@ public class OneDayWeatherFragment extends Fragment {
         return result.toString();
 
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo){
+
+        super.onCreateContextMenu(menu, view, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.menu_context_one_day, menu);
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_share_one_day:
+
+                StringBuilder message = new StringBuilder(today).append("\n");
+                message.append(temperature).append(": ").append(temperatureForecast).append("\n").
+                        append(wind).append(": ").append(windForecast).append("\n").
+                        append(pressure).append(": ").append(pressureForecast).append("\n").
+                        append(humidity).append(": ").append(humidityForecast).append("\n");
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, message.toString());
+                String chooserTitle = getString(R.string.chooser);
+                Intent chooseIntent = Intent.createChooser(intent,chooserTitle);
+                getActivity().startActivity(chooseIntent);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
 
 }

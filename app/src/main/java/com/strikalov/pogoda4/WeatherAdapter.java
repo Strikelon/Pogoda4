@@ -1,8 +1,11 @@
 package com.strikalov.pogoda4;
 
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,7 +48,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position){
-        CardView cardView = holder.cardView;
+
+        final CardView cardView = holder.cardView;
 
         WeatherData weatherItem = weatherDataList.get(position);
 

@@ -16,7 +16,7 @@
 
     <ImageView
         android:layout_width="260dp"
-        android:layout_height="200dp"
+        android:layout_height="192dp"
         android:scaleType="centerCrop"
         android:layout_margin="16dp"
         android:src="@drawable/developer"/>

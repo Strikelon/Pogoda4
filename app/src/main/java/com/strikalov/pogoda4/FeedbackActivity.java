@@ -1,5 +1,7 @@
 package com.strikalov.pogoda4;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,8 +35,13 @@ public class FeedbackActivity extends AppCompatActivity {
     }
 
     public void onClickSendFeedback(View view){
-        topic.setText("");
-        text.setText("");
-        Toast.makeText(this,textAfterSendFeedBack, Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + "strikalov.aleksandr@yandex.ru"));
+        intent.putExtra(Intent.EXTRA_SUBJECT, topic.getText().toString());
+        intent.putExtra(Intent.EXTRA_TEXT, text.getText().toString());
+        String chooserTitle = getString(R.string.chooser);
+        Intent chooseIntent = Intent.createChooser(intent,chooserTitle);
+        startActivity(chooseIntent);
+
     }
 }

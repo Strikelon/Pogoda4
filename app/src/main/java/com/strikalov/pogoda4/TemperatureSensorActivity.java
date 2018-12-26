@@ -32,19 +32,28 @@ public class TemperatureSensorActivity extends AppCompatActivity {
         temperature_text = findViewById(R.id.temperature_sensor_text);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorTemperature = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        temperatureMeasure = getString(R.string.temperature_measure);
+
 
         if(sensorTemperature == null){
 
             temperature_text.setText(getString(R.string.sensor_null));
 
-        }else {
+        }
+    }
 
-            temperatureMeasure = getString(R.string.temperature_measure);
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(sensorTemperature != null){
 
             sensorManager.registerListener(listenerTemperature, sensorTemperature,
                     SensorManager.SENSOR_DELAY_NORMAL);
 
         }
+
+
     }
 
     @Override

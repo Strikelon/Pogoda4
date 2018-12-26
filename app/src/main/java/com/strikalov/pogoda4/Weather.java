@@ -1,8 +1,11 @@
 package com.strikalov.pogoda4;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Calendar;
 
-public class Weather  {
+public class Weather implements Parcelable {
 
     private Calendar calendar;
     private WeatherPicture weatherPicture;
@@ -79,5 +82,44 @@ public class Weather  {
     public void setHumidity(String humidity) {
         this.humidity = humidity;
     }
+
+    protected Weather(Parcel in) {
+        calendar = (Calendar) in.readValue(Calendar.class.getClassLoader());
+        weatherPicture = (WeatherPicture) in.readValue(WeatherPicture.class.getClassLoader());
+        temperature = in.readString();
+        wind = in.readString();
+        windDirection = (WindDirection) in.readValue(WindDirection.class.getClassLoader());
+        pressure = in.readString();
+        humidity = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(calendar);
+        dest.writeValue(weatherPicture);
+        dest.writeString(temperature);
+        dest.writeString(wind);
+        dest.writeValue(windDirection);
+        dest.writeString(pressure);
+        dest.writeString(humidity);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Weather> CREATOR = new Parcelable.Creator<Weather>() {
+        @Override
+        public Weather createFromParcel(Parcel in) {
+            return new Weather(in);
+        }
+
+        @Override
+        public Weather[] newArray(int size) {
+            return new Weather[size];
+        }
+    };
 
 }

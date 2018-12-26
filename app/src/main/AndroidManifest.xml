@@ -39,14 +39,21 @@
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".TemperatureSensorActivity"
+        <activity
+            android:name=".TemperatureSensorActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".HumiditySensorActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HumiditySensorActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name=".GetWeatherService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

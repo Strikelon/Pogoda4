@@ -2,12 +2,18 @@ package com.strikalov.pogoda4;
 
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
+
+import java.util.ArrayList;
+
 
 public class SecondActivity extends AppCompatActivity {
 
@@ -16,10 +22,14 @@ public class SecondActivity extends AppCompatActivity {
     private String[] cities;
     private int cityIndex;
 
+    private ServiceConnection connection;
+    private GetWeatherService service;
+    private boolean bind = false;
+
     private OneDayWeatherFragment oneDayWeatherFragment;
     private SevenDaysWeatherFragment sevenDaysWeatherFragment;
 
-    private FrameLayout fragmentContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +40,20 @@ public class SecondActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        connection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                service = ((GetWeatherService.GetWeatherBinder) binder).getService();
+                bind = true;
+                initFragments(cityIndex);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                bind = false;
+            }
+        };
+
         cities = getResources().getStringArray(R.array.cities);
 
         if(getIntent() != null && getIntent().getExtras()!= null){
@@ -38,18 +62,56 @@ public class SecondActivity extends AppCompatActivity {
 
             setTitle(cities[cityIndex]);
 
-            oneDayWeatherFragment = OneDayWeatherFragment.newInstance(cityIndex);
-            sevenDaysWeatherFragment = SevenDaysWeatherFragment.newInstance(cityIndex);
-
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragment_container,oneDayWeatherFragment);
-            fragmentTransaction.commit();
+            Intent intent = new Intent(getBaseContext(), GetWeatherService.class);
+            bindService(intent, connection, BIND_AUTO_CREATE);
 
         }else {
             finish();
             return;
         }
     }
+
+    private Weather getWeatherToday(int cityIndex){
+        if(bind){
+            return service.getWeatherToday(cityIndex);
+        }else {
+            return null;
+        }
+    }
+
+    private ArrayList<Weather> getWeatherList(int cityIndex){
+        if(bind){
+            return service.getWeather(cityIndex);
+        }else {
+            return null;
+        }
+    }
+
+    private void initFragments(int cityIndex){
+
+        Weather weather = getWeatherToday(cityIndex);
+        ArrayList<Weather> weatherList = getWeatherList(cityIndex);
+
+        if(weather != null && weatherList != null) {
+
+            oneDayWeatherFragment = OneDayWeatherFragment.newInstance(weather);
+            sevenDaysWeatherFragment = SevenDaysWeatherFragment.newInstance(weatherList);
+
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.fragment_container, oneDayWeatherFragment);
+            fragmentTransaction.commit();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bind) {
+            unbindService(connection);
+            bind = false;
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

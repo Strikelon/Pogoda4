@@ -32,19 +32,27 @@ public class HumiditySensorActivity extends AppCompatActivity {
         humidity_text = findViewById(R.id.humidity_sensor_text);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorHumidity = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+        humidityMeasure = getString(R.string.humidity_measure);
 
         if(sensorHumidity == null){
 
             humidity_text.setText(getString(R.string.sensor_null));
 
-        }else {
+        }
 
-            humidityMeasure = getString(R.string.humidity_measure);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(sensorHumidity != null){
 
             sensorManager.registerListener(listenerHumidity, sensorHumidity,
                     SensorManager.SENSOR_DELAY_NORMAL);
 
         }
+
     }
 
     @Override

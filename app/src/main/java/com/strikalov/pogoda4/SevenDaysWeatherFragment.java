@@ -8,28 +8,26 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 
 public class SevenDaysWeatherFragment extends Fragment {
 
-    private static final String CITY_INDEX = "city_index";
+    private static final String WEATHER_LIST = "weather_list";
 
-    public static SevenDaysWeatherFragment newInstance(int city_index){
+    public static SevenDaysWeatherFragment newInstance(ArrayList<Weather> weatherList){
 
         SevenDaysWeatherFragment sevenDaysWeatherFragment = new SevenDaysWeatherFragment();
         Bundle args = new Bundle();
-        args.putInt(CITY_INDEX, city_index);
+        args.putParcelableArrayList(WEATHER_LIST,weatherList);
         sevenDaysWeatherFragment.setArguments(args);
         return sevenDaysWeatherFragment;
     }
 
-    private int getCityIndex() {
-        return getArguments().getInt(CITY_INDEX);
+    private ArrayList<Weather> getWeatherList(){
+        return getArguments().getParcelableArrayList(WEATHER_LIST);
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,12 +36,7 @@ public class SevenDaysWeatherFragment extends Fragment {
         RecyclerView sevenDaysRecycler = (RecyclerView)inflater.inflate(
                 R.layout.fragment_seven_days_weather, container, false);
 
-        int cityIndex = getCityIndex();
-
-
-        WeatherCreator weatherCreator = WeatherCreator.getInstance();
-
-        List<Weather> weatherForecast = weatherCreator.getWeather(cityIndex);
+        ArrayList<Weather> weatherForecast = getWeatherList();
 
         WeatherDataBuilder weatherDataBuilder = new WeatherDataBuilder(weatherForecast, getResources());
 

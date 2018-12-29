@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 public class OneDayWeatherFragment extends Fragment {
 
-    private static final String CITY_INDEX = "city_index";
+    private static final String WEATHER_TODAY = "weather_today";
 
     private String today;
     private String temperature;
@@ -29,17 +29,17 @@ public class OneDayWeatherFragment extends Fragment {
     private String humidity;
     private String humidityForecast;
 
-    public static OneDayWeatherFragment newInstance(int city_index){
+    public static OneDayWeatherFragment newInstance(Weather weather){
 
         OneDayWeatherFragment oneDayWeatherFragment = new OneDayWeatherFragment();
         Bundle args = new Bundle();
-        args.putInt(CITY_INDEX, city_index);
+        args.putParcelable(WEATHER_TODAY, weather);
         oneDayWeatherFragment.setArguments(args);
         return oneDayWeatherFragment;
     }
 
-    private int getCityIndex() {
-        return getArguments().getInt(CITY_INDEX);
+    private Weather getWeather(){
+        return getArguments().getParcelable(WEATHER_TODAY);
     }
 
     @Override
@@ -70,11 +70,7 @@ public class OneDayWeatherFragment extends Fragment {
         ImageView imagePressure = view.findViewById(R.id.picture_pressure_today);
         ImageView imageHumidity = view.findViewById(R.id.picture_humidity_today);
 
-        int cityIndex = getCityIndex();
-
-        WeatherCreator weatherCreator = WeatherCreator.getInstance();
-
-        Weather weatherToday = weatherCreator.getWeatherToday(cityIndex);
+        Weather weatherToday = getWeather();
 
         if(weatherToday != null){
 

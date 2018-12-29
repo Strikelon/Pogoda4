@@ -7,10 +7,10 @@ import java.util.List;
 
 public class WeatherCreator {
 
-    private List<Weather> PetersburgForecast = new ArrayList<>();
-    private List<Weather> MoscowForecast = new ArrayList<>();
-    private List<Weather> RostovForecast = new ArrayList<>();
-    private List<Weather> SochiForecast = new ArrayList<>();
+    private ArrayList<Weather> PetersburgForecast = new ArrayList<>();
+    private ArrayList<Weather> MoscowForecast = new ArrayList<>();
+    private ArrayList<Weather> RostovForecast = new ArrayList<>();
+    private ArrayList<Weather> SochiForecast = new ArrayList<>();
 
     private Calendar calendar;
 
@@ -90,7 +90,7 @@ public class WeatherCreator {
     }
 
 
-    public List<Weather> getWeather(int cityIndex) {
+    public  ArrayList<Weather> getWeather(int cityIndex) {
         switch (cityIndex) {
             case 0:
                 return PetersburgForecast;

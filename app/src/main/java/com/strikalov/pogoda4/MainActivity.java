@@ -5,22 +5,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Spinner citySpinner;
+    private final String SQL_EXCEPTION_TAG = "sql_exception";
+    private ImageView backgroundPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,26 +47,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         citySpinner = findViewById(R.id.city_spinner);
 
-        ImageView backgroundPicture = findViewById(R.id.background_picture);
-        int imageIndex = updateBackgroundImage();
-
-        if(imageIndex != -1){
-            backgroundPicture.setImageResource(imageIndex);
-        }
+        backgroundPicture = findViewById(R.id.background_picture);
+        updateBackgroundImage(backgroundPicture);
 
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
-
-        ImageView backgroundPicture = findViewById(R.id.background_picture);
-        int imageIndex = updateBackgroundImage();
-
-        if(imageIndex != -1){
-            backgroundPicture.setImageResource(imageIndex);
-        }
-
+        updateBackgroundImage(backgroundPicture);
     }
 
     public void onClickShowWeather(View view) {
@@ -82,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Intent intent = null;
 
-        switch(id){
+        switch (id) {
             case R.id.nav_backgroud:
                 intent = new Intent(this, ChangeBackgroundActivity.class);
                 break;
@@ -90,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent = new Intent(this, TemperatureSensorActivity.class);
                 break;
             case R.id.nav_humidity_sensor:
-                intent = new Intent(this,HumiditySensorActivity.class);
+                intent = new Intent(this, HumiditySensorActivity.class);
                 break;
             case R.id.nav_about_developer:
                 intent = new Intent(this, AboutDeveloperActivity.class);
@@ -100,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
 
-        if(intent != null){
+        if (intent != null) {
             startActivity(intent);
         }
 
@@ -119,32 +111,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public int updateBackgroundImage(){
+    private void updateBackgroundImage(ImageView backgroundPicture) {
 
-        int imageIndex = -1;
-
-        SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(this, getResources());
-
-        try {
-
-            SQLiteDatabase db = backgroundPictureDatabaseHelper.getReadableDatabase();
-            Cursor cursor = db.query("PICTURE",new String[]{"IMAGE_RESOURCE_ID"},"SELECTED = 1",
-                    null, null, null, null);
-
-            if(cursor.moveToFirst()) {
-                imageIndex = cursor.getInt(0);
-            }
-
-            cursor.close();
-            db.close();
-
-        }catch (SQLiteException e){
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
-        return imageIndex;
+        GetImageIdTask getImageIdTask = new GetImageIdTask(backgroundPicture);
+        getImageIdTask.execute();
 
     }
+
+    private class GetImageIdTask extends AsyncTask<Void, Void, Integer> {
+
+        private final ImageView backgroundPicture;
+
+        private GetImageIdTask(ImageView backgroundPicture) {
+            this.backgroundPicture = backgroundPicture;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+
+            int imageIndex = -1;
+
+            SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(MainActivity.this, getResources());
+
+            try {
+
+                SQLiteDatabase db = backgroundPictureDatabaseHelper.getReadableDatabase();
+                Cursor cursor = db.query("PICTURE", new String[]{"IMAGE_RESOURCE_ID"}, "SELECTED = 1",
+                        null, null, null, null);
+
+                if (cursor.moveToFirst()) {
+                    imageIndex = cursor.getInt(0);
+                }
+
+                cursor.close();
+                db.close();
+
+                return imageIndex;
+
+            } catch (SQLiteException e) {
+                Log.e(SQL_EXCEPTION_TAG, "Database unavailable");
+                return -1;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer imageId) {
+
+            if (imageId != -1) {
+                backgroundPicture.setImageResource(imageId);
+            }
+
+        }
+
+    }
+
 
 }

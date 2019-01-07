@@ -59,11 +59,13 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
 
             SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(
                     ChangeBackgroundActivity.this, getResources());
+            SQLiteDatabase db = null;
+            Cursor cursor = null;
 
             try {
 
-                SQLiteDatabase db = backgroundPictureDatabaseHelper.getReadableDatabase();
-                Cursor cursor = db.query("PICTURE", new String[]{"_id", "NAME", "IMAGE_RESOURCE_ID_MINI", "SELECTED"},
+                db = backgroundPictureDatabaseHelper.getReadableDatabase();
+                cursor = db.query("PICTURE", new String[]{"_id", "NAME", "IMAGE_RESOURCE_ID_MINI", "SELECTED"},
                         null, null, null, null, null);
 
                 while (cursor.moveToNext()) {
@@ -77,13 +79,18 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
 
                 }
 
-                cursor.close();
-                db.close();
                 return true;
 
             } catch (SQLiteException e) {
-                Log.e(SQL_EXCEPTION_TAG, "Database unavailable");
+                Log.e(SQL_EXCEPTION_TAG, "Database unavailable", e);
                 return false;
+            } finally {
+                if(cursor != null) {
+                    cursor.close();
+                }
+                if(db != null) {
+                    db.close();
+                }
             }
         }
 
@@ -116,10 +123,11 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
 
                 SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(
                         ChangeBackgroundActivity.this, getResources());
+                SQLiteDatabase db = null;
 
                 try {
 
-                    SQLiteDatabase db = backgroundPictureDatabaseHelper.getWritableDatabase();
+                    db = backgroundPictureDatabaseHelper.getWritableDatabase();
 
                     for (BackgroundPicture backgroundPicture : backgroundPicturesList) {
 
@@ -131,12 +139,15 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
 
                     }
 
-                    db.close();
                     return true;
 
                 } catch (SQLiteException e) {
-                    Log.e(SQL_EXCEPTION_TAG, "Database unavailable");
+                    Log.e(SQL_EXCEPTION_TAG, "Database unavailable", e);
                     return false;
+                } finally {
+                    if(db != null){
+                        db.close();
+                    }
                 }
 
             }else {

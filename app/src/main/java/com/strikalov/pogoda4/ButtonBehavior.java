@@ -10,7 +10,6 @@ import android.view.View;
 
 public class ButtonBehavior extends CoordinatorLayout.Behavior<FloatingActionButton>{
 
-    private float initialX;         // начальное значение X изображения, от нее и будем отталкиваться
     private float initialY;
     private boolean firstMove = true;   // Нам надо получить начальное значение X только один раз
 
@@ -32,12 +31,10 @@ public class ButtonBehavior extends CoordinatorLayout.Behavior<FloatingActionBut
         // инициализация начального значения X
         if (firstMove) {
             firstMove = false;
-            initialX = child.getX();
             initialY = child.getY();
         }
 
         // изображение будет перемещаться в нижней части экрана
-        child.setX(initialX + dependency.getY() * 0.46f);
         child.setY(initialY + dependency.getY());
         return false;
     }

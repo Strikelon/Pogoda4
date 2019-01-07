@@ -3,12 +3,14 @@
     <string name="headline">Выберите город:</string>
     <string name="picture_background">Фон риложения</string>
     <string name="today">Сегодня</string>
+
     <string-array name="cities">
         <item>Санкт-Петербург</item>
         <item>Москва</item>
         <item>Ростов-на-дону</item>
         <item>Сочи</item>
     </string-array>
+
     <string name="temp_tab">Темп.°C</string>
     <string name="wind_tab">Ветер</string>
     <string name="pressure_tab">Давление</string>
@@ -21,6 +23,7 @@
     <string name="pressure_measure">мм</string>
     <string name="humidity">Влажность</string>
     <string name="humidity_measure">%</string>
+
     <string-array name="day_of_week">
         <item>Воскресенье</item>
         <item>Понедельник</item>
@@ -30,6 +33,7 @@
         <item>Пятница</item>
         <item>Суббота</item>
     </string-array>
+
     <string-array name="month">
         <item>января</item>
         <item>февраля</item>
@@ -44,9 +48,11 @@
         <item>ноября</item>
         <item>декабря</item>
     </string-array>
+
     <string name="one_day_string">1 день</string>
-    <string name="seven_days_string">7 дней</string>
+    <string name="five_days_string">5 дней</string>
     <string name="options_menu_description">Прогноз погоды на:</string>
+
     <string name="error_weather_parcer_null">Ошибка! WeatherParcer дал результат null!</string>
     <string name="app_contacts">example@mail.ru</string>
     <string name="nav_support">Поддержка</string>
@@ -61,13 +67,16 @@
     <string name="text_feedback">Текст</string>
     <string name="send_feedback">Отправить</string>
     <string name="after_click_send_feedback">Сообщение отправлено</string>
+
     <string name="temperature_sensor">Температурный датчик</string>
     <string name="sensor_null">Датчик отсутствует\n на устройстве</string>
     <string name="sensor_value_is">Показания датчика:</string>
     <string name="humidity_sensor">Датчик влажности</string>
+
     <string name="temperature_measure">°C</string>
     <string name="share_for_friends">Рассказать друзьям</string>
     <string name="chooser">Отправить сообщение через ...</string>
+
     <string name="sky">Небо</string>
     <string name="forest">Лес</string>
     <string name="desert">Пустыня</string>
@@ -76,4 +85,27 @@
     <string name="mountains">Горы</string>
     <string name="accept">Подтвердить</string>
     <string name="picture_updated">Картинка обновлена!</string>
+
+    <string name="nav_settings_name">Настройки</string>
+    <string name="settings_measure_units_name">Единицы измерения</string>
+    <string name="settings_wind_speed_name">Скорость ветра</string>
+    <string name="settings_temperature_name">Температура</string>
+    <string name="settings_pressure_name">Атм. давление</string>
+    <string name="settings_radio_meters_name">м/с</string>
+    <string name="settings_radio_kilometers_name">км/ч</string>
+    <string name="settings_radio_celsius_name">С°</string>
+    <string name="settings_radio_fahrenheit_name">F°</string>
+    <string name="settings_radio_mm_name">мм</string>
+    <string name="settings_radio_hpa_name">hPa</string>
+
+    <string name="render_temperature_measure_celsius">°C</string>
+    <string name="render_temperature_measure_fahrenheit">°F</string>
+    <string name="render_wind_measure_meters">м/с</string>
+    <string name="render_wind_measure_kilometers">км/ч</string>
+    <string name="render_pressure_measure_mm">мм</string>
+    <string name="render_pressure_measure_hpa">hPa</string>
+    <string name="render_humidity_measure">%</string>
+
+    <string name="show_download_progress">Ожидаем ответ от сервера...</string>
+
 </resources>

@@ -56,6 +56,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         ImageView imageView = cardView.findViewById(R.id.picture_info);
         imageView.setImageResource(weatherItem.getPicture());
 
+        ImageView imageWindDirection = cardView.findViewById(R.id.picture_wind_dir);
+        imageWindDirection.setImageResource(weatherItem.getWindDirectionPicture());
+
         TextView dateInfo = cardView.findViewById(R.id.date_info);
         dateInfo.setText(weatherItem.getDate());
 

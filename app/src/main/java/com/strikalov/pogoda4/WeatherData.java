@@ -8,14 +8,24 @@ public class WeatherData {
     private String wind;
     private String pressure;
     private String humidity;
+    private int windDirectionPicture;
 
-    public WeatherData(String date, int picture, String temperature, String wind, String pressure, String humidity){
+    public WeatherData(String date, int picture, String temperature, String wind, String pressure, String humidity, int windDirectionPicture){
         this.date = date;
         this.picture = picture;
         this.temperature = temperature;
         this.wind = wind;
         this.pressure = pressure;
         this.humidity = humidity;
+        this.windDirectionPicture = windDirectionPicture;
+    }
+
+    public int getWindDirectionPicture() {
+        return windDirectionPicture;
+    }
+
+    public void setWindDirectionPicture(int windDirectionPicture) {
+        this.windDirectionPicture = windDirectionPicture;
     }
 
     public String getDate() {

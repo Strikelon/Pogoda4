@@ -9,7 +9,8 @@ public enum WindDirection {
     EAST("EAST"),
     SOUTH("SOUTH"),
     SOUTH_WEST("SOUTH_WEST"),
-    SOUTH_EAST("SOUTH_EAST");
+    SOUTH_EAST("SOUTH_EAST"),
+    NO_DIRECTION("NO_DIRECTION");
 
     private String description;
 

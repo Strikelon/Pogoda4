@@ -15,8 +15,8 @@
             android:checked="true"/>
 
         <item
-            android:id="@+id/seven_days"
-            android:title="@string/seven_days_string"/>
+            android:id="@+id/five_days"
+            android:title="@string/five_days_string"/>
     </group>
 
 </menu>

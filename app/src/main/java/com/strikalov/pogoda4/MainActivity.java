@@ -1,6 +1,7 @@
 package com.strikalov.pogoda4;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -25,6 +26,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final String SQL_EXCEPTION_TAG = "sql_exception";
     private ImageView backgroundPicture;
 
+    private SharedPreferences sharedPref;
+
+    private final String CITY_INDEX_PREFERENCE = "city_index_preference";
+    private final String KEY_CITY_INDEX_PREFERENCE = "key_city_index";
+    private final int DEFAULT_CITY_INDEX = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +52,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        sharedPref = getSharedPreferences(CITY_INDEX_PREFERENCE, MODE_PRIVATE);
+        int loadedCityIndex = sharedPref.getInt(KEY_CITY_INDEX_PREFERENCE, DEFAULT_CITY_INDEX);
+
         citySpinner = findViewById(R.id.city_spinner);
+        citySpinner.setSelection(loadedCityIndex);
 
         backgroundPicture = findViewById(R.id.background_picture);
         updateBackgroundImage(backgroundPicture);
@@ -55,12 +66,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onRestart() {
         super.onRestart();
+
+        int loadedCityIndex = sharedPref.getInt(KEY_CITY_INDEX_PREFERENCE, DEFAULT_CITY_INDEX);
+        citySpinner.setSelection(loadedCityIndex);
+
         updateBackgroundImage(backgroundPicture);
     }
 
     public void onClickShowWeather(View view) {
 
         int cityIndex = citySpinner.getSelectedItemPosition();
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(KEY_CITY_INDEX_PREFERENCE, cityIndex);
+        editor.apply();
 
         Intent intent = new Intent(this, SecondActivity.class);
         intent.putExtra(SecondActivity.CITY_QUERY, cityIndex);
@@ -89,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_feedback:
                 intent = new Intent(this, FeedbackActivity.class);
+                break;
+            case R.id.nav_settings:
+                intent = new Intent(this, SettingsActivity.class);
+                break;
+            default:
                 break;
         }
 
@@ -132,25 +156,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int imageIndex = -1;
 
             SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(MainActivity.this, getResources());
+            SQLiteDatabase db = null;
+            Cursor cursor = null;
 
             try {
 
-                SQLiteDatabase db = backgroundPictureDatabaseHelper.getReadableDatabase();
-                Cursor cursor = db.query("PICTURE", new String[]{"IMAGE_RESOURCE_ID"}, "SELECTED = 1",
+                db = backgroundPictureDatabaseHelper.getReadableDatabase();
+                cursor = db.query("PICTURE", new String[]{"IMAGE_RESOURCE_ID"}, "SELECTED = 1",
                         null, null, null, null);
 
                 if (cursor.moveToFirst()) {
                     imageIndex = cursor.getInt(0);
                 }
 
-                cursor.close();
-                db.close();
-
                 return imageIndex;
 
             } catch (SQLiteException e) {
-                Log.e(SQL_EXCEPTION_TAG, "Database unavailable");
+
+                Log.e(SQL_EXCEPTION_TAG, "Database unavailable", e);
                 return -1;
+
+            }finally {
+
+                if(cursor != null) {
+                    cursor.close();
+                }
+                if(db != null) {
+                    db.close();
+                }
+
             }
 
         }

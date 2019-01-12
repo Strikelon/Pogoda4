@@ -1,5 +1,6 @@
 package com.strikalov.pogoda4;
 
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.content.ComponentName;
@@ -21,15 +22,21 @@ public class SecondActivity extends AppCompatActivity {
 
     private String[] cities;
     private int cityIndex;
+    private int cityId;
 
     private ServiceConnection connection;
     private GetWeatherService service;
     private boolean bind = false;
 
+    private boolean isGetWeather = false;
+    private boolean isOneDayChecked = true;
+    private boolean isGetWeatherArrayList = false;
+    private boolean isFiveDaysChecked = false;
+
     private OneDayWeatherFragment oneDayWeatherFragment;
     private SevenDaysWeatherFragment sevenDaysWeatherFragment;
 
-
+    private SharedPreferences sharedPrefMeasureSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +52,7 @@ public class SecondActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName name, IBinder binder) {
                 service = ((GetWeatherService.GetWeatherBinder) binder).getService();
                 bind = true;
-                initFragments(cityIndex);
+                initFragments(cityId, sharedPrefMeasureSettings);
             }
 
             @Override
@@ -62,8 +69,18 @@ public class SecondActivity extends AppCompatActivity {
 
             setTitle(cities[cityIndex]);
 
+            CityIdData cityIdData = new CityIdData();
+
+            cityId = cityIdData.getId(cityIndex);
+
             Intent intent = new Intent(getBaseContext(), GetWeatherService.class);
             bindService(intent, connection, BIND_AUTO_CREATE);
+
+            sharedPrefMeasureSettings = getSharedPreferences(SettingsConstants.MEASURE_SETTINGS, MODE_PRIVATE);
+
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.fragment_container, new ShowDownloadProgressFragment());
+            fragmentTransaction.commit();
 
         }else {
             finish();
@@ -71,35 +88,37 @@ public class SecondActivity extends AppCompatActivity {
         }
     }
 
-    private Weather getWeatherToday(int cityIndex){
+    private void initFragments(int cityId, SharedPreferences sharedPrefMeasureSettings){
         if(bind){
-            return service.getWeatherToday(cityIndex);
-        }else {
-            return null;
-        }
-    }
 
-    private ArrayList<Weather> getWeatherList(int cityIndex){
-        if(bind){
-            return service.getWeather(cityIndex);
-        }else {
-            return null;
-        }
-    }
+            service.downloadWeather(cityId, sharedPrefMeasureSettings, new GetWeatherService.DownloadWeatherListener() {
+                @Override
+                public void onComplete(Weather weather) {
+                    isGetWeather = true;
+                    oneDayWeatherFragment = OneDayWeatherFragment.newInstance(weather);
 
-    private void initFragments(int cityIndex){
+                    if(isOneDayChecked) {
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.fragment_container, oneDayWeatherFragment);
+                        fragmentTransaction.commit();
+                    }
+                }
+            });
 
-        Weather weather = getWeatherToday(cityIndex);
-        ArrayList<Weather> weatherList = getWeatherList(cityIndex);
+            service.downloadWeatherArrayList(cityId, sharedPrefMeasureSettings, new GetWeatherService.DownloadWeatherArrayListListener() {
+                @Override
+                public void onComplete(ArrayList<Weather> weatherArrayList) {
+                    isGetWeatherArrayList = true;
+                    sevenDaysWeatherFragment = SevenDaysWeatherFragment.newInstance(weatherArrayList);
 
-        if(weather != null && weatherList != null) {
+                    if(isFiveDaysChecked) {
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.replace(R.id.fragment_container, sevenDaysWeatherFragment);
+                        fragmentTransaction.commit();
+                    }
+                }
+            });
 
-            oneDayWeatherFragment = OneDayWeatherFragment.newInstance(weather);
-            sevenDaysWeatherFragment = SevenDaysWeatherFragment.newInstance(weatherList);
-
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragment_container, oneDayWeatherFragment);
-            fragmentTransaction.commit();
         }
     }
 
@@ -128,15 +147,31 @@ public class SecondActivity extends AppCompatActivity {
         switch (id) {
             case R.id.one_day:
                 item.setChecked(true);
-                FragmentTransaction fragmentTransaction1 = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction1.replace(R.id.fragment_container,oneDayWeatherFragment);
-                fragmentTransaction1.commit();
+                isOneDayChecked = true;
+                isFiveDaysChecked = false;
+                if(isGetWeather) {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, oneDayWeatherFragment);
+                    fragmentTransaction.commit();
+                }else {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, new ShowDownloadProgressFragment());
+                    fragmentTransaction.commit();
+                }
                 return true;
-            case R.id.seven_days:
+            case R.id.five_days:
                 item.setChecked(true);
-                FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction2.replace(R.id.fragment_container,sevenDaysWeatherFragment);
-                fragmentTransaction2.commit();
+                isOneDayChecked = false;
+                isFiveDaysChecked = true;
+                if(isGetWeatherArrayList) {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, sevenDaysWeatherFragment);
+                    fragmentTransaction.commit();
+                }else {
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, new ShowDownloadProgressFragment());
+                    fragmentTransaction.commit();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -53,9 +53,6 @@ public class OneDayWeatherFragment extends Fragment {
         wind = getString(R.string.wind);
         pressure = getString(R.string.pressure);
         humidity = getString(R.string.humidity);
-        String windMeasure = getString(R.string.wind_measure);
-        String pressureMeasure = getString(R.string.pressure_measure);
-        String humidityMeasure = getString(R.string.humidity_measure);
 
         CardView cardViewOneDay = view.findViewById(R.id.card_view_one_day);
         registerForContextMenu(cardViewOneDay);
@@ -75,9 +72,9 @@ public class OneDayWeatherFragment extends Fragment {
         if(weatherToday != null){
 
             temperatureForecast = weatherToday.getTemperature();
-            windForecast = getForecastString(windMeasure, weatherToday.getWind());
-            pressureForecast = getForecastString(pressureMeasure, weatherToday.getPressure());
-            humidityForecast = getForecastString(humidityMeasure, weatherToday.getHumidity());
+            windForecast = weatherToday.getWind();
+            pressureForecast = weatherToday.getPressure();
+            humidityForecast = weatherToday.getHumidity();
 
             textTemperature.setText(temperatureForecast);
             textWind.setText(windForecast);
@@ -88,18 +85,62 @@ public class OneDayWeatherFragment extends Fragment {
             imageHumidity.setImageResource(R.drawable.humidity);
 
             switch (weatherToday.getWeatherPicture()) {
-                case SUN:
-                    imageTemperature.setImageResource(R.drawable.sun);
+                case D01:
+                    imageTemperature.setImageResource(R.drawable.d01);
                     break;
-                case RAIN:
-                    imageTemperature.setImageResource(R.drawable.rain);
+                case N01:
+                    imageTemperature.setImageResource(R.drawable.n01);
                     break;
-                case SNOW:
-                    imageTemperature.setImageResource(R.drawable.snow);
+                case D02:
+                    imageTemperature.setImageResource(R.drawable.d02);
                     break;
-                case CLOUD:
-                    imageTemperature.setImageResource(R.drawable.cloud);
+                case N02:
+                    imageTemperature.setImageResource(R.drawable.n02);
                     break;
+                case D03:
+                    imageTemperature.setImageResource(R.drawable.d03);
+                    break;
+                case N03:
+                    imageTemperature.setImageResource(R.drawable.n03);
+                    break;
+                case D04:
+                    imageTemperature.setImageResource(R.drawable.d04);
+                    break;
+                case N04:
+                    imageTemperature.setImageResource(R.drawable.n04);
+                    break;
+                case D09:
+                    imageTemperature.setImageResource(R.drawable.d09);
+                    break;
+                case N09:
+                    imageTemperature.setImageResource(R.drawable.n09);
+                    break;
+                case D10:
+                    imageTemperature.setImageResource(R.drawable.d10);
+                    break;
+                case N10:
+                    imageTemperature.setImageResource(R.drawable.n10);
+                    break;
+                case D11:
+                    imageTemperature.setImageResource(R.drawable.d11);
+                    break;
+                case N11:
+                    imageTemperature.setImageResource(R.drawable.n11);
+                    break;
+                case D13:
+                    imageTemperature.setImageResource(R.drawable.d13);
+                    break;
+                case N13:
+                    imageTemperature.setImageResource(R.drawable.n13);
+                    break;
+                case D50:
+                    imageTemperature.setImageResource(R.drawable.d50);
+                    break;
+                case N50:
+                    imageTemperature.setImageResource(R.drawable.n50);
+                    break;
+                case NO_ICON:
+                    imageTemperature.setImageResource(R.drawable.no_icon_temperature);
             }
 
             switch (weatherToday.getWindDirection()) {
@@ -127,20 +168,14 @@ public class OneDayWeatherFragment extends Fragment {
                 case SOUTH_EAST:
                     imageWind.setImageResource(R.drawable.south_east);
                     break;
+                case NO_DIRECTION:
+                    imageWind.setImageResource(R.drawable.no_direction_wind);
+                    break;
             }
 
         }
 
         return view;
-    }
-
-    private String getForecastString(String measure, String value){
-
-        StringBuilder result = new StringBuilder(value);
-        result.append(" ").append(measure);
-
-        return result.toString();
-
     }
 
     @Override

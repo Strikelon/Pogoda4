@@ -14,8 +14,10 @@ public class Weather implements Parcelable {
     private WindDirection windDirection;
     private String pressure;
     private String humidity;
+    private String time;
 
-    public Weather(Calendar calendar, WeatherPicture weatherPicture, String temperature, String wind, WindDirection windDirection, String pressure, String humidity) {
+    public Weather(Calendar calendar, WeatherPicture weatherPicture, String temperature, String wind,
+                   WindDirection windDirection, String pressure, String humidity) {
 
         this.calendar = calendar;
         this.weatherPicture = weatherPicture;
@@ -24,7 +26,29 @@ public class Weather implements Parcelable {
         this.windDirection = windDirection;
         this.pressure = pressure;
         this.humidity = humidity;
+        this.time = "";
+    }
 
+    public Weather(Calendar calendar, WeatherPicture weatherPicture, String temperature, String wind, WindDirection windDirection,
+                   String pressure, String humidity, String time) {
+
+        this.calendar = calendar;
+        this.weatherPicture = weatherPicture;
+        this.temperature = temperature;
+        this.wind = wind;
+        this.windDirection = windDirection;
+        this.pressure = pressure;
+        this.humidity = humidity;
+        this.time = time;
+
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public Calendar getCalendar() {
@@ -91,6 +115,7 @@ public class Weather implements Parcelable {
         windDirection = (WindDirection) in.readValue(WindDirection.class.getClassLoader());
         pressure = in.readString();
         humidity = in.readString();
+        time = in.readString();
     }
 
     @Override
@@ -107,6 +132,7 @@ public class Weather implements Parcelable {
         dest.writeValue(windDirection);
         dest.writeString(pressure);
         dest.writeString(humidity);
+        dest.writeString(time);
     }
 
     @SuppressWarnings("unused")

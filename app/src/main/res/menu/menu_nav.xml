@@ -15,6 +15,11 @@
         android:icon="@android:drawable/ic_menu_compass"
         android:title="@string/humidity_sensor" />
 
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/nav_settings_name"/>
+
     <item android:title="@string/nav_support">
         <menu>
             <item

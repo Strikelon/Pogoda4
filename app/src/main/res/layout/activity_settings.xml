@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SettingsActivity">
+    tools:context=".activities.SettingsActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_settings"
@@ -82,18 +82,18 @@
 
                 <RadioButton
                     android:id="@+id/radio_meters"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:checked="true"
                     android:onClick="onRadioButtonWindSpeedGroupClicked"
                     android:text="@string/settings_radio_meters_name" />
 
                 <RadioButton
                     android:id="@+id/radio_kilometers"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:onClick="onRadioButtonWindSpeedGroupClicked"
                     android:text="@string/settings_radio_kilometers_name" />
 
@@ -112,18 +112,18 @@
 
                 <RadioButton
                     android:id="@+id/radio_celsius"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:checked="true"
                     android:onClick="onRadioButtonTemperatureGroupClicked"
                     android:text="@string/settings_radio_celsius_name" />
 
                 <RadioButton
                     android:id="@+id/radio_fahrenheit"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:onClick="onRadioButtonTemperatureGroupClicked"
                     android:text="@string/settings_radio_fahrenheit_name" />
 
@@ -142,18 +142,18 @@
 
                 <RadioButton
                     android:id="@+id/radio_mm"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:checked="true"
                     android:onClick="onRadioButtonPressureGroupClicked"
                     android:text="@string/settings_radio_mm_name" />
 
                 <RadioButton
                     android:id="@+id/radio_hpa"
-                    android:layout_width="wrap_content"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:onClick="onRadioButtonPressureGroupClicked"
                     android:text="@string/settings_radio_hpa_name" />
 

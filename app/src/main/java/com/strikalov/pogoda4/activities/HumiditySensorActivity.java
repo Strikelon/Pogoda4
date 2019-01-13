@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.activities;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
+
+import com.strikalov.pogoda4.R;
 
 public class HumiditySensorActivity extends AppCompatActivity {
 

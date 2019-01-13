@@ -22,43 +22,43 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SecondActivity"
+            android:name=".activities.SecondActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ChangeBackgroundActivity"
+            android:name=".activities.ChangeBackgroundActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".AboutDeveloperActivity"
+            android:name=".activities.AboutDeveloperActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".FeedbackActivity"
+            android:name=".activities.FeedbackActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".TemperatureSensorActivity"
+            android:name=".activities.TemperatureSensorActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".HumiditySensorActivity"
+            android:name=".activities.HumiditySensorActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
 
         <service
-            android:name=".GetWeatherService"
+            android:name=".services.GetWeatherService"
             android:enabled="true"
             android:exported="false" />
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"></activity>

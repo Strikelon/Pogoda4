@@ -20,6 +20,15 @@ import android.widget.Spinner;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBarDrawerToggle;
 
+import com.strikalov.pogoda4.activities.AboutDeveloperActivity;
+import com.strikalov.pogoda4.activities.ChangeBackgroundActivity;
+import com.strikalov.pogoda4.activities.FeedbackActivity;
+import com.strikalov.pogoda4.activities.HumiditySensorActivity;
+import com.strikalov.pogoda4.activities.SecondActivity;
+import com.strikalov.pogoda4.activities.SettingsActivity;
+import com.strikalov.pogoda4.activities.TemperatureSensorActivity;
+import com.strikalov.pogoda4.databases.BackgroundPictureDatabaseHelper;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private Spinner citySpinner;
@@ -85,6 +94,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         intent.putExtra(SecondActivity.CITY_QUERY, cityIndex);
         startActivity(intent);
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        int cityIndex = citySpinner.getSelectedItemPosition();
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(KEY_CITY_INDEX_PREFERENCE, cityIndex);
+        editor.apply();
     }
 
     @Override

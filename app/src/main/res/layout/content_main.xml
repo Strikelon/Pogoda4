@@ -94,7 +94,7 @@
         android:layout_margin="16dp"
         android:onClick="onClickShowWeather"
         android:src="@drawable/ic_done_white_24dp"
-        app:layout_behavior="com.strikalov.pogoda4.ButtonBehavior" />
+        app:layout_behavior="com.strikalov.pogoda4.utils.ButtonBehavior" />
 
 
 </android.support.design.widget.CoordinatorLayout>

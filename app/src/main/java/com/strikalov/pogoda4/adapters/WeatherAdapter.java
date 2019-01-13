@@ -1,14 +1,14 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.adapters;
 
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.models.WeatherData;
 
 import java.util.List;
 

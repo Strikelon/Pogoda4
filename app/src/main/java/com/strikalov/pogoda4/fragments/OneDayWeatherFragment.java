@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.fragments;
 
 
 import android.content.Intent;
@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.models.Weather;
 
 
 public class OneDayWeatherFragment extends Fragment {

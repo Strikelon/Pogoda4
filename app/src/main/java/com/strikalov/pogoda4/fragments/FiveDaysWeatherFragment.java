@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.fragments;
 
 
 import android.os.Bundle;
@@ -9,20 +9,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.models.Weather;
+import com.strikalov.pogoda4.adapters.WeatherAdapter;
+import com.strikalov.pogoda4.utils.WeatherDataBuilder;
+
 import java.util.ArrayList;
 
 
-public class SevenDaysWeatherFragment extends Fragment {
+public class FiveDaysWeatherFragment extends Fragment {
 
     private static final String WEATHER_LIST = "weather_list";
 
-    public static SevenDaysWeatherFragment newInstance(ArrayList<Weather> weatherList){
+    public static FiveDaysWeatherFragment newInstance(ArrayList<Weather> weatherList){
 
-        SevenDaysWeatherFragment sevenDaysWeatherFragment = new SevenDaysWeatherFragment();
+        FiveDaysWeatherFragment fiveDaysWeatherFragment = new FiveDaysWeatherFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList(WEATHER_LIST,weatherList);
-        sevenDaysWeatherFragment.setArguments(args);
-        return sevenDaysWeatherFragment;
+        fiveDaysWeatherFragment.setArguments(args);
+        return fiveDaysWeatherFragment;
     }
 
     private ArrayList<Weather> getWeatherList(){
@@ -33,8 +38,8 @@ public class SevenDaysWeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        RecyclerView sevenDaysRecycler = (RecyclerView)inflater.inflate(
-                R.layout.fragment_seven_days_weather, container, false);
+        RecyclerView fiveDaysRecycler = (RecyclerView)inflater.inflate(
+                R.layout.fragment_five_days_weather, container, false);
 
         ArrayList<Weather> weatherForecast = getWeatherList();
 
@@ -42,13 +47,13 @@ public class SevenDaysWeatherFragment extends Fragment {
 
         WeatherAdapter weatherAdapter = new WeatherAdapter(weatherDataBuilder.build());
 
-        sevenDaysRecycler.setAdapter(weatherAdapter);
+        fiveDaysRecycler.setAdapter(weatherAdapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 
-        sevenDaysRecycler.setLayoutManager(linearLayoutManager);
+        fiveDaysRecycler.setLayoutManager(linearLayoutManager);
 
-        return sevenDaysRecycler;
+        return fiveDaysRecycler;
     }
 
 }

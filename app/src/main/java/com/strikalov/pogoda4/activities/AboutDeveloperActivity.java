@@ -1,9 +1,11 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.activities;
 
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+
+import com.strikalov.pogoda4.R;
 
 public class AboutDeveloperActivity extends AppCompatActivity {
 

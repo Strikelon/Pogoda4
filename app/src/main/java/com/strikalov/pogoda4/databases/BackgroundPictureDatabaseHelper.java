@@ -1,10 +1,12 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.databases;
 
 import android.content.ContentValues;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.strikalov.pogoda4.R;
 
 public class BackgroundPictureDatabaseHelper  extends SQLiteOpenHelper{
 
@@ -13,7 +15,7 @@ public class BackgroundPictureDatabaseHelper  extends SQLiteOpenHelper{
 
     private Resources resources;
 
-    BackgroundPictureDatabaseHelper(Context context, Resources resources){
+    public BackgroundPictureDatabaseHelper(Context context, Resources resources){
         super(context, DB_NAME, null, DB_VERSION);
         this.resources = resources;
     }

@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.activities;
 
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentTransaction;
@@ -12,6 +12,15 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.constants.SettingsConstants;
+import com.strikalov.pogoda4.fragments.FiveDaysWeatherFragment;
+import com.strikalov.pogoda4.fragments.OneDayWeatherFragment;
+import com.strikalov.pogoda4.fragments.ShowDownloadProgressFragment;
+import com.strikalov.pogoda4.models.CityIdData;
+import com.strikalov.pogoda4.models.Weather;
+import com.strikalov.pogoda4.services.GetWeatherService;
 
 import java.util.ArrayList;
 
@@ -34,7 +43,7 @@ public class SecondActivity extends AppCompatActivity {
     private boolean isFiveDaysChecked = false;
 
     private OneDayWeatherFragment oneDayWeatherFragment;
-    private SevenDaysWeatherFragment sevenDaysWeatherFragment;
+    private FiveDaysWeatherFragment fiveDaysWeatherFragment;
 
     private SharedPreferences sharedPrefMeasureSettings;
 
@@ -91,7 +100,9 @@ public class SecondActivity extends AppCompatActivity {
     private void initFragments(int cityId, SharedPreferences sharedPrefMeasureSettings){
         if(bind){
 
-            service.downloadWeather(cityId, sharedPrefMeasureSettings, new GetWeatherService.DownloadWeatherListener() {
+            service.initPrefVariables(sharedPrefMeasureSettings);
+
+            service.downloadWeather(cityId, new GetWeatherService.DownloadWeatherListener() {
                 @Override
                 public void onComplete(Weather weather) {
                     isGetWeather = true;
@@ -105,15 +116,15 @@ public class SecondActivity extends AppCompatActivity {
                 }
             });
 
-            service.downloadWeatherArrayList(cityId, sharedPrefMeasureSettings, new GetWeatherService.DownloadWeatherArrayListListener() {
+            service.downloadWeatherArrayList(cityId, new GetWeatherService.DownloadWeatherArrayListListener() {
                 @Override
                 public void onComplete(ArrayList<Weather> weatherArrayList) {
                     isGetWeatherArrayList = true;
-                    sevenDaysWeatherFragment = SevenDaysWeatherFragment.newInstance(weatherArrayList);
+                    fiveDaysWeatherFragment = FiveDaysWeatherFragment.newInstance(weatherArrayList);
 
                     if(isFiveDaysChecked) {
                         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.fragment_container, sevenDaysWeatherFragment);
+                        fragmentTransaction.replace(R.id.fragment_container, fiveDaysWeatherFragment);
                         fragmentTransaction.commit();
                     }
                 }
@@ -165,7 +176,7 @@ public class SecondActivity extends AppCompatActivity {
                 isFiveDaysChecked = true;
                 if(isGetWeatherArrayList) {
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, sevenDaysWeatherFragment);
+                    fragmentTransaction.replace(R.id.fragment_container, fiveDaysWeatherFragment);
                     fragmentTransaction.commit();
                 }else {
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();

@@ -1,6 +1,10 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.utils;
 
 import android.content.res.Resources;
+
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.models.Weather;
+import com.strikalov.pogoda4.models.WeatherData;
 
 import java.util.ArrayList;
 import java.util.Calendar;

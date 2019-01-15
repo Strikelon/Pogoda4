@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

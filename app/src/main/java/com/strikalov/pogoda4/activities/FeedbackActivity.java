@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.strikalov.pogoda4.R;
 
 public class FeedbackActivity extends AppCompatActivity {
 

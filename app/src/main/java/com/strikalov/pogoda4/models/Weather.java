@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

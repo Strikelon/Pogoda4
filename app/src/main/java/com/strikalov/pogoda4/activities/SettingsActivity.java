@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.activities;
 
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
@@ -8,6 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.constants.SettingsConstants;
 
 public class SettingsActivity extends AppCompatActivity{
 

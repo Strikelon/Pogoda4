@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.services;
 
 import android.app.Service;
 import android.content.Intent;
@@ -9,21 +9,26 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.constants.SettingsConstants;
+import com.strikalov.pogoda4.models.Weather;
+import com.strikalov.pogoda4.models.WeatherPicture;
+import com.strikalov.pogoda4.models.WindDirection;
+import com.strikalov.pogoda4.pojogson.ForecastRequest;
+import com.strikalov.pogoda4.pojogson.WeatherRequest;
+import com.strikalov.pogoda4.interfaces.OpenWeather;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GetWeatherService extends Service {
 
@@ -36,10 +41,8 @@ public class GetWeatherService extends Service {
     private String pressureMeasure = "";
     private String humidityMeasure = "";
 
-    private final String ONE_DAY_REQUEST = "http://api.openweathermap.org/data/2.5/weather?id=%d&appid=e397147f38c213ae53717fb01f417e20";
-    private final String FIVE_DAYS_REQUEST = "http://api.openweathermap.org/data/2.5/forecast?id=%d&appid=e397147f38c213ae53717fb01f417e20";
-    private final int SERVER_OK = 200;
-    private final String RESPONSE = "cod";
+    private final String URL_REQUEST = "http://api.openweathermap.org/";
+    private final String KEY_API = "e397147f38c213ae53717fb01f417e20";
 
     private final IBinder binder = new GetWeatherBinder();
 
@@ -73,7 +76,7 @@ public class GetWeatherService extends Service {
         super.onDestroy();
     }
 
-    private void initPrefVariables(SharedPreferences sharedPrefMeasureSettings) {
+    public void initPrefVariables(SharedPreferences sharedPrefMeasureSettings) {
 
         windSetting = sharedPrefMeasureSettings.getInt(SettingsConstants.KEY_WIND_MEASURE_SETTINGS, SettingsConstants.DEFAULT_WIND_SETTING);
         temperatureSetting = sharedPrefMeasureSettings.getInt(SettingsConstants.KEY_TEMPERATURE_MEASURE_SETTINGS, SettingsConstants.DEFAULT_TEMPERATURE_SETTING);
@@ -253,203 +256,138 @@ public class GetWeatherService extends Service {
         return weatherPicture;
     }
 
-    public void downloadWeather(int cityId, SharedPreferences sharedPrefMeasureSettings, DownloadWeatherListener downloadWeatherListener) {
+    private Weather weatherRequestRender(WeatherRequest weatherRequest){
+
+        Date date = new Date(weatherRequest.getDt()*1000);
+
+        Calendar calendar = new GregorianCalendar(date.getYear()+1900,date.getMonth(),date.getDate());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        String time = dateFormat.format(date);
+
+        String tempString = getTemperature(weatherRequest.getTemp());
+
+        String pressureString = getPressure(weatherRequest.getPressure());
+
+        String humidityString = weatherRequest.getHumidity() + " " + humidityMeasure;
+
+        String windSpeedString = getWindSpeed(weatherRequest.getSpeed());
+
+        WindDirection windDirection = gerWindDirection((int)weatherRequest.getDeg());
+
+        WeatherPicture weatherPicture = getIcon(weatherRequest.getIcon());
+
+        return new Weather(calendar, weatherPicture, tempString, windSpeedString,
+                windDirection, pressureString, humidityString, time);
+
+    }
+
+    public void downloadWeather(int cityId, DownloadWeatherListener downloadWeatherListener) {
 
         final DownloadWeatherListener onDownloadWeatherListener = downloadWeatherListener;
 
-        initPrefVariables(sharedPrefMeasureSettings);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL_REQUEST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        String url = String.format(ONE_DAY_REQUEST, cityId);
+        OpenWeather openWeather = retrofit.create(OpenWeather.class);
 
-        OkHttpClient client = new OkHttpClient();
-        Request.Builder builder = new Request.Builder();
-        builder.url(url);
-        Request request = builder.build();
+        openWeather.loadWeather(cityId, KEY_API)
+                .enqueue(new Callback<WeatherRequest>() {
+                    final Handler handler = new Handler();
 
-        Call call = client.newCall(request);
-
-        call.enqueue(new Callback() {
-            final Handler handler = new Handler();
-
-            public void onResponse(@NonNull Call call, @NonNull Response response)
-                    throws IOException {
-
-                final String answer = response.body().string();
-
-                handler.post(new Runnable() {
                     @Override
-                    public void run() {
-                            renderOneDayWeather(onDownloadWeatherListener, answer);
+                    public void onResponse(@NonNull Call<WeatherRequest> call,
+                                           @NonNull Response<WeatherRequest> response) {
+                        if (response.body() != null) {
+                            final WeatherRequest weatherRequest = response.body();
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    renderOneDayWeather(onDownloadWeatherListener, weatherRequest);
+                                }
+                            });
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<WeatherRequest> call,
+                                          @NonNull Throwable throwable) {
+                        Log.e("GetWeather", "downloadWeather failed", throwable);
                     }
                 });
-            }
-
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.e("GetWeather", "downloadWeather failed", e);
-            }
-        });
 
     }
 
-    private void renderOneDayWeather(DownloadWeatherListener downloadWeatherListener, String answer) {
+    private void renderOneDayWeather(DownloadWeatherListener downloadWeatherListener, WeatherRequest weatherRequest) {
 
-        try {
-            JSONObject jsonObject = new JSONObject(answer);
-
-            if (jsonObject.getInt(RESPONSE) == SERVER_OK) {
-
-                JSONObject main = jsonObject.getJSONObject("main");
-
-                String tempString = getTemperature(main.getDouble("temp"));
-
-                String pressureString = getPressure(main.getDouble("pressure"));
-
-                String humidityString = main.getString("humidity") + " " + humidityMeasure;
-
-                JSONObject wind = jsonObject.getJSONObject("wind");
-
-                String windSpeedString = getWindSpeed(wind.getDouble("speed"));
-
-                WindDirection windDirection;
-
-                if(wind.has("deg")){
-                    windDirection = gerWindDirection(wind.getInt("deg"));
-                }else {
-                    windDirection = WindDirection.NO_DIRECTION;
-                }
-
-                JSONObject weatherDetails = jsonObject.getJSONArray("weather").getJSONObject(0);
-
-                WeatherPicture weatherPicture;
-
-                if(weatherDetails.has("icon")) {
-                    weatherPicture = getIcon(weatherDetails.getString("icon"));
-                }else {
-                    weatherPicture = WeatherPicture.NO_ICON;
-                }
-
-                Weather weather = new Weather(new GregorianCalendar(), weatherPicture, tempString, windSpeedString,
-                        windDirection, pressureString, humidityString);
-
-                downloadWeatherListener.onComplete(weather);
-
-            } else {
-                Log.e("GetWeather", "renderOneDayWeather failed");
-            }
-
-        } catch (Exception e) {
-            Log.e("GetWeather", "renderOneDayWeather failed", e);
-        }
+        downloadWeatherListener.onComplete(weatherRequestRender(weatherRequest));
 
     }
 
-    public void downloadWeatherArrayList(int cityId, SharedPreferences sharedPrefMeasureSettings,
+    public void downloadWeatherArrayList(int cityId,
                                 DownloadWeatherArrayListListener downloadWeatherArrayListListener) {
 
         final DownloadWeatherArrayListListener onDownloadWeatherArrayListListener = downloadWeatherArrayListListener;
 
-        initPrefVariables(sharedPrefMeasureSettings);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL_REQUEST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        String url = String.format(FIVE_DAYS_REQUEST, cityId);
+        OpenWeather openWeather = retrofit.create(OpenWeather.class);
 
-        OkHttpClient client = new OkHttpClient();
-        Request.Builder builder = new Request.Builder();
-        builder.url(url);
-        Request request = builder.build();
+        openWeather.loadForecast(cityId, KEY_API)
+                .enqueue(new Callback<ForecastRequest>() {
 
-        Call call = client.newCall(request);
+                    final Handler handler = new Handler();
 
-        call.enqueue(new Callback() {
-            final Handler handler = new Handler();
-
-            public void onResponse(@NonNull Call call, @NonNull Response response)
-                    throws IOException {
-
-                final String answer = response.body().string();
-
-                handler.post(new Runnable() {
                     @Override
-                    public void run() {
-                        renderFiveDaysWeather(onDownloadWeatherArrayListListener, answer);
+                    public void onResponse(@NonNull Call<ForecastRequest> call,
+                                           @NonNull Response<ForecastRequest> response) {
+                        if (response.body() != null){
+
+                            final ForecastRequest forecastRequest = response.body();
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    renderFiveDaysWeather(onDownloadWeatherArrayListListener, forecastRequest);
+                                }
+                            });
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ForecastRequest> call,
+                                          @NonNull Throwable throwable) {
+                        Log.e("GetWeather", "downloadWeatherArrayList failed", throwable);
                     }
                 });
-            }
 
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.e("GetWeather", "downloadWeatherArrayList failed", e);
-            }
-        });
 
     }
 
-    private void renderFiveDaysWeather(DownloadWeatherArrayListListener downloadWeatherArrayListListener, String answer) {
+    private void renderFiveDaysWeather(DownloadWeatherArrayListListener downloadWeatherArrayListListener,
+                                       ForecastRequest forecastRequest) {
 
-        try {
-            JSONObject jsonObject = new JSONObject(answer);
+        ArrayList<Weather> weatherArrayList = new ArrayList<>();
 
-            if (jsonObject.getInt(RESPONSE) == SERVER_OK) {
+        WeatherRequest[] weatherRequests = forecastRequest.getWeatherRequests();
 
-                JSONArray listArray = jsonObject.getJSONArray("list");
+        for(int i=0; i < weatherRequests.length; i++){
 
-                ArrayList<Weather> weatherArrayList = new ArrayList<>();
+            weatherArrayList.add(weatherRequestRender(weatherRequests[i]));
 
-                for(int i=0; i < listArray.length(); i++){
-
-                    JSONObject currentJsonObject = listArray.getJSONObject(i);
-
-                    Date date = new Date(currentJsonObject.getLong("dt")*1000);
-
-                    Calendar calendar = new GregorianCalendar(date.getYear()+1900,date.getMonth(),date.getDate());
-
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-                    String time = dateFormat.format(date);
-
-                    JSONObject main = currentJsonObject.getJSONObject("main");
-
-                    String tempString = getTemperature(main.getDouble("temp"));
-
-                    String pressureString = getPressure(main.getDouble("pressure"));
-
-                    String humidityString = main.getString("humidity") + " " + humidityMeasure;
-
-                    JSONObject wind = currentJsonObject.getJSONObject("wind");
-
-                    String windSpeedString = getWindSpeed(wind.getDouble("speed"));
-
-                    WindDirection windDirection;
-
-                    if(wind.has("deg")){
-                        windDirection = gerWindDirection(wind.getInt("deg"));
-                    }else {
-                        windDirection = WindDirection.NO_DIRECTION;
-                    }
-
-                    JSONObject weatherDetails = currentJsonObject.getJSONArray("weather").getJSONObject(0);
-
-                    WeatherPicture weatherPicture;
-
-                    if(weatherDetails.has("icon")) {
-                        weatherPicture = getIcon(weatherDetails.getString("icon"));
-                    }else {
-                        weatherPicture = WeatherPicture.NO_ICON;
-                    }
-
-                    weatherArrayList.add(new Weather(calendar, weatherPicture, tempString, windSpeedString,
-                            windDirection, pressureString, humidityString, time));
-                }
-
-                downloadWeatherArrayListListener.onComplete(weatherArrayList);
-
-            } else {
-                Log.e("GetWeather", "renderFiveDaysWeather failed");
-            }
-
-        } catch (Exception e) {
-            Log.e("GetWeather", "renderFiveDaysWeather failed", e);
         }
 
+        downloadWeatherArrayListListener.onComplete(weatherArrayList);
+
     }
-
-
 
 }

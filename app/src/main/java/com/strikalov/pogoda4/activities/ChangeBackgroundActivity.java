@@ -1,4 +1,4 @@
-package com.strikalov.pogoda4;
+package com.strikalov.pogoda4.activities;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -15,6 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.adapters.PictureBackgroundRecyclerViewAdapter;
+import com.strikalov.pogoda4.databases.BackgroundPictureDatabaseHelper;
+import com.strikalov.pogoda4.models.BackgroundPicture;
 
 import java.util.ArrayList;
 import java.util.List;

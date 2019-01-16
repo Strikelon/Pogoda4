@@ -10,7 +10,7 @@
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="290dp"
+        android:layout_height="212dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -48,7 +48,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="30dp"
             android:layout_marginRight="24dp"
             android:layout_marginLeft="24dp"
@@ -73,12 +73,31 @@
                     android:textColor="#000000"
                     android:textSize="20sp" />
 
-                <Spinner
-                    android:id="@+id/city_spinner"
+                <TextView
+                    android:id="@+id/main_city_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    android:entries="@array/cities" />
+                    android:textColor="#000000"
+                    android:textSize="22sp"
+                    android:onClick="onClickShowSearchCityInData"/>
+
+                <Button
+                    android:id="@+id/button_city_database_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/baseline_search_black_18"
+                    android:drawablePadding="4dp"
+                    android:text="@string/city_database_search"
+                    android:onClick="onClickShowSearchCityInData"/>
+
+                <Button
+                    android:id="@+id/button_city_geo_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/baseline_room_black_18"
+                    android:drawablePadding="4dp"
+                    android:text="@string/city_geo_search"/>
 
 
             </LinearLayout>

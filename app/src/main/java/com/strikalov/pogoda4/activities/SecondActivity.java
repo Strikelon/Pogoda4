@@ -18,7 +18,6 @@ import com.strikalov.pogoda4.constants.SettingsConstants;
 import com.strikalov.pogoda4.fragments.FiveDaysWeatherFragment;
 import com.strikalov.pogoda4.fragments.OneDayWeatherFragment;
 import com.strikalov.pogoda4.fragments.ShowDownloadProgressFragment;
-import com.strikalov.pogoda4.models.CityIdData;
 import com.strikalov.pogoda4.models.Weather;
 import com.strikalov.pogoda4.services.GetWeatherService;
 
@@ -27,11 +26,11 @@ import java.util.ArrayList;
 
 public class SecondActivity extends AppCompatActivity {
 
-    public static final String CITY_QUERY = "CityQuery";
+    public static final String INTENT_CITY_INDEX = "CityQuery";
+    public static final String INTENT_CITY_NAME = "CityQueryName";
 
-    private String[] cities;
-    private int cityIndex;
-    private int cityId;
+    private String cityIndex;
+    private String cityName;
 
     private ServiceConnection connection;
     private GetWeatherService service;
@@ -44,6 +43,7 @@ public class SecondActivity extends AppCompatActivity {
 
     private OneDayWeatherFragment oneDayWeatherFragment;
     private FiveDaysWeatherFragment fiveDaysWeatherFragment;
+    private ShowDownloadProgressFragment showDownloadProgressFragment;
 
     private SharedPreferences sharedPrefMeasureSettings;
 
@@ -61,7 +61,7 @@ public class SecondActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName name, IBinder binder) {
                 service = ((GetWeatherService.GetWeatherBinder) binder).getService();
                 bind = true;
-                initFragments(cityId, sharedPrefMeasureSettings);
+                initFragments(cityIndex, sharedPrefMeasureSettings);
             }
 
             @Override
@@ -70,39 +70,36 @@ public class SecondActivity extends AppCompatActivity {
             }
         };
 
-        cities = getResources().getStringArray(R.array.cities);
-
         if(getIntent() != null && getIntent().getExtras()!= null){
 
-            cityIndex = getIntent().getExtras().getInt(CITY_QUERY);
+            cityIndex = getIntent().getExtras().getString(INTENT_CITY_INDEX);
+            cityName = getIntent().getExtras().getString(INTENT_CITY_NAME);
 
-            setTitle(cities[cityIndex]);
-
-            CityIdData cityIdData = new CityIdData();
-
-            cityId = cityIdData.getId(cityIndex);
+            setTitle(cityName);
 
             Intent intent = new Intent(getBaseContext(), GetWeatherService.class);
             bindService(intent, connection, BIND_AUTO_CREATE);
 
             sharedPrefMeasureSettings = getSharedPreferences(SettingsConstants.MEASURE_SETTINGS, MODE_PRIVATE);
 
+            String showDownloadText = getString(R.string.show_download_progress);
+            showDownloadProgressFragment = ShowDownloadProgressFragment.newInstance(showDownloadText);
+
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.fragment_container, new ShowDownloadProgressFragment());
+            fragmentTransaction.add(R.id.fragment_container, showDownloadProgressFragment);
             fragmentTransaction.commit();
 
         }else {
             finish();
-            return;
         }
     }
 
-    private void initFragments(int cityId, SharedPreferences sharedPrefMeasureSettings){
+    private void initFragments(String cityIndex, SharedPreferences sharedPrefMeasureSettings){
         if(bind){
 
             service.initPrefVariables(sharedPrefMeasureSettings);
 
-            service.downloadWeather(cityId, new GetWeatherService.DownloadWeatherListener() {
+            service.downloadWeather(cityIndex, new GetWeatherService.DownloadWeatherListener() {
                 @Override
                 public void onComplete(Weather weather) {
                     isGetWeather = true;
@@ -116,7 +113,7 @@ public class SecondActivity extends AppCompatActivity {
                 }
             });
 
-            service.downloadWeatherArrayList(cityId, new GetWeatherService.DownloadWeatherArrayListListener() {
+            service.downloadWeatherArrayList(cityIndex, new GetWeatherService.DownloadWeatherArrayListListener() {
                 @Override
                 public void onComplete(ArrayList<Weather> weatherArrayList) {
                     isGetWeatherArrayList = true;
@@ -166,7 +163,7 @@ public class SecondActivity extends AppCompatActivity {
                     fragmentTransaction.commit();
                 }else {
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, new ShowDownloadProgressFragment());
+                    fragmentTransaction.replace(R.id.fragment_container, showDownloadProgressFragment);
                     fragmentTransaction.commit();
                 }
                 return true;
@@ -180,7 +177,7 @@ public class SecondActivity extends AppCompatActivity {
                     fragmentTransaction.commit();
                 }else {
                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, new ShowDownloadProgressFragment());
+                    fragmentTransaction.replace(R.id.fragment_container, showDownloadProgressFragment);
                     fragmentTransaction.commit();
                 }
                 return true;

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.SelectedCitiesActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_selected_cities"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_margin="16dp">
+
+        <Button
+            android:id="@+id/button_selected_city_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/baseline_cached_black_18"
+            android:drawablePadding="4dp"
+            android:text="@string/selected_cities_refresh_all"
+            android:onClick="onClickUpdateSelectedCities"/>
+
+        <Button
+            android:id="@+id/button_selected_city_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/baseline_add_circle_black_18"
+            android:drawablePadding="4dp"
+            android:text="@string/selected_cities_add_city"
+            android:onClick="onStartSearchCityInData"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/selected_cities_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </FrameLayout>
+
+</LinearLayout>

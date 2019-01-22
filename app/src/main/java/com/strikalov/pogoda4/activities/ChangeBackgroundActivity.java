@@ -63,22 +63,25 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... voids) {
 
             SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(
-                    ChangeBackgroundActivity.this, getResources());
+                    ChangeBackgroundActivity.this);
             SQLiteDatabase db = null;
             Cursor cursor = null;
 
             try {
 
                 db = backgroundPictureDatabaseHelper.getReadableDatabase();
-                cursor = db.query("PICTURE", new String[]{"_id", "NAME", "IMAGE_RESOURCE_ID_MINI", "SELECTED"},
+                cursor = db.query(BackgroundPictureDatabaseHelper.TABLE_PICTURE,
+                        new String[]{BackgroundPictureDatabaseHelper.COLUMN_ID, BackgroundPictureDatabaseHelper.COLUMN_NAME,
+                                BackgroundPictureDatabaseHelper.COLUMN_IMAGE_RESOURCE_ID_MINI,
+                                BackgroundPictureDatabaseHelper.COLUMN_SELECTED},
                         null, null, null, null, null);
 
                 while (cursor.moveToNext()) {
 
-                    int id = cursor.getInt(0);
-                    String name = cursor.getString(1);
-                    int imageResourceId = cursor.getInt(2);
-                    boolean isChecked = (cursor.getInt(3) == 1);
+                    int id = cursor.getInt(cursor.getColumnIndex(BackgroundPictureDatabaseHelper.COLUMN_ID));
+                    String name = cursor.getString(cursor.getColumnIndex(BackgroundPictureDatabaseHelper.COLUMN_NAME));
+                    int imageResourceId = cursor.getInt(cursor.getColumnIndex(BackgroundPictureDatabaseHelper.COLUMN_IMAGE_RESOURCE_ID_MINI));
+                    boolean isChecked = (cursor.getInt(cursor.getColumnIndex(BackgroundPictureDatabaseHelper.COLUMN_SELECTED)) == 1);
 
                     backgroundPicturesList.add(new BackgroundPicture(id, name, imageResourceId, isChecked));
 
@@ -127,7 +130,7 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
             if(backgroundPicturesList.size()>0) {
 
                 SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(
-                        ChangeBackgroundActivity.this, getResources());
+                        ChangeBackgroundActivity.this);
                 SQLiteDatabase db = null;
 
                 try {
@@ -137,9 +140,10 @@ public class ChangeBackgroundActivity extends AppCompatActivity {
                     for (BackgroundPicture backgroundPicture : backgroundPicturesList) {
 
                         ContentValues pictureValues = new ContentValues();
-                        pictureValues.put("SELECTED", backgroundPicture.isChecked());
+                        pictureValues.put(BackgroundPictureDatabaseHelper.COLUMN_SELECTED, backgroundPicture.isChecked());
 
-                        db.update("PICTURE", pictureValues, "_id = ?",
+                        db.update(BackgroundPictureDatabaseHelper.TABLE_PICTURE, pictureValues,
+                                BackgroundPictureDatabaseHelper.COLUMN_ID + " = ?",
                                 new String[]{Integer.toString(backgroundPicture.getId())});
 
                     }

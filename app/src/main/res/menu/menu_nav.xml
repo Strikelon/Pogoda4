@@ -20,6 +20,11 @@
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/nav_settings_name"/>
 
+    <item
+        android:id="@+id/nav_selected_cities"
+        android:icon="@android:drawable/ic_menu_mapmode"
+        android:title="@string/nav_selected_cities" />
+
     <item android:title="@string/nav_support">
         <menu>
             <item

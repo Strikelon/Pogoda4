@@ -19,27 +19,32 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.strikalov.pogoda4.activities.AboutDeveloperActivity;
 import com.strikalov.pogoda4.activities.ChangeBackgroundActivity;
 import com.strikalov.pogoda4.activities.FeedbackActivity;
 import com.strikalov.pogoda4.activities.HumiditySensorActivity;
+import com.strikalov.pogoda4.activities.SearchCityInDataActivity;
 import com.strikalov.pogoda4.activities.SecondActivity;
+import com.strikalov.pogoda4.activities.SelectedCitiesActivity;
 import com.strikalov.pogoda4.activities.SettingsActivity;
 import com.strikalov.pogoda4.activities.TemperatureSensorActivity;
+import com.strikalov.pogoda4.constants.CityPreferenceConstants;
 import com.strikalov.pogoda4.databases.BackgroundPictureDatabaseHelper;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Spinner citySpinner;
     private final String SQL_EXCEPTION_TAG = "sql_exception";
     private ImageView backgroundPicture;
 
     private SharedPreferences sharedPref;
 
-    private final String CITY_INDEX_PREFERENCE = "city_index_preference";
-    private final String KEY_CITY_INDEX_PREFERENCE = "key_city_index";
-    private final int DEFAULT_CITY_INDEX = 0;
+    private String loadedCityIndex;
+    private String loadedCityName;
+
+    private TextView textViewCityName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +66,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        sharedPref = getSharedPreferences(CITY_INDEX_PREFERENCE, MODE_PRIVATE);
-        int loadedCityIndex = sharedPref.getInt(KEY_CITY_INDEX_PREFERENCE, DEFAULT_CITY_INDEX);
+        textViewCityName = findViewById(R.id.main_city_name);
 
-        citySpinner = findViewById(R.id.city_spinner);
-        citySpinner.setSelection(loadedCityIndex);
+        sharedPref = getSharedPreferences(CityPreferenceConstants.CITY_INDEX_PREFERENCE, MODE_PRIVATE);
+
+        loadedCityIndex = sharedPref.getString(CityPreferenceConstants.KEY_CITY_INDEX_PREFERENCE,
+                CityPreferenceConstants.DEFAULT_CITY_INDEX);
+        loadedCityName = sharedPref.getString(CityPreferenceConstants.KEY_CITY_NAME_PREFERENCE,
+                CityPreferenceConstants.DEFAULT_CITY_NAME);
+
+        textViewCityName.setText(loadedCityName);
 
         backgroundPicture = findViewById(R.id.background_picture);
         updateBackgroundImage(backgroundPicture);
@@ -76,34 +86,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onRestart() {
         super.onRestart();
 
-        int loadedCityIndex = sharedPref.getInt(KEY_CITY_INDEX_PREFERENCE, DEFAULT_CITY_INDEX);
-        citySpinner.setSelection(loadedCityIndex);
+        loadedCityIndex = sharedPref.getString(CityPreferenceConstants.KEY_CITY_INDEX_PREFERENCE,
+                CityPreferenceConstants.DEFAULT_CITY_INDEX);
+        loadedCityName = sharedPref.getString(CityPreferenceConstants.KEY_CITY_NAME_PREFERENCE,
+                CityPreferenceConstants.DEFAULT_CITY_NAME);
+
+        textViewCityName.setText(loadedCityName);
 
         updateBackgroundImage(backgroundPicture);
     }
 
     public void onClickShowWeather(View view) {
 
-        int cityIndex = citySpinner.getSelectedItemPosition();
+        if(!loadedCityIndex.equals(CityPreferenceConstants.DEFAULT_CITY_INDEX)) {
 
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(KEY_CITY_INDEX_PREFERENCE, cityIndex);
-        editor.apply();
+            sharedPref.edit().putString(CityPreferenceConstants.KEY_CITY_INDEX_PREFERENCE, loadedCityIndex).apply();
+            sharedPref.edit().putString(CityPreferenceConstants.KEY_CITY_NAME_PREFERENCE, loadedCityName).apply();
 
-        Intent intent = new Intent(this, SecondActivity.class);
-        intent.putExtra(SecondActivity.CITY_QUERY, cityIndex);
+            Intent intent = new Intent(this, SecondActivity.class);
+            intent.putExtra(SecondActivity.INTENT_CITY_INDEX, loadedCityIndex);
+            intent.putExtra(SecondActivity.INTENT_CITY_NAME, loadedCityName);
+            startActivity(intent);
+
+        }else {
+
+            Toast.makeText(MainActivity.this, R.string.city_is_not_accepted ,Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    public void onClickShowSearchCityInData(View view){
+        Intent intent = new Intent(this, SearchCityInDataActivity.class);
         startActivity(intent);
-
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        int cityIndex = citySpinner.getSelectedItemPosition();
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(KEY_CITY_INDEX_PREFERENCE, cityIndex);
-        editor.apply();
+        sharedPref.edit().putString(CityPreferenceConstants.KEY_CITY_INDEX_PREFERENCE, loadedCityIndex).apply();
+        sharedPref.edit().putString(CityPreferenceConstants.KEY_CITY_NAME_PREFERENCE, loadedCityName).apply();
     }
 
     @Override
@@ -130,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_settings:
                 intent = new Intent(this, SettingsActivity.class);
+                break;
+            case R.id.nav_selected_cities:
+                intent = new Intent(this, SelectedCitiesActivity.class);
                 break;
             default:
                 break;
@@ -174,18 +200,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             int imageIndex = -1;
 
-            SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(MainActivity.this, getResources());
+            SQLiteOpenHelper backgroundPictureDatabaseHelper = new BackgroundPictureDatabaseHelper(MainActivity.this);
             SQLiteDatabase db = null;
             Cursor cursor = null;
 
             try {
 
                 db = backgroundPictureDatabaseHelper.getReadableDatabase();
-                cursor = db.query("PICTURE", new String[]{"IMAGE_RESOURCE_ID"}, "SELECTED = 1",
+                cursor = db.query(BackgroundPictureDatabaseHelper.TABLE_PICTURE,
+                        new String[]{BackgroundPictureDatabaseHelper.COLUMN_IMAGE_RESOURCE_ID},
+                        BackgroundPictureDatabaseHelper.COLUMN_SELECTED +" = 1",
                         null, null, null, null);
 
                 if (cursor.moveToFirst()) {
-                    imageIndex = cursor.getInt(0);
+                    imageIndex = cursor.getInt(cursor.getColumnIndex(BackgroundPictureDatabaseHelper.COLUMN_IMAGE_RESOURCE_ID));
                 }
 
                 return imageIndex;

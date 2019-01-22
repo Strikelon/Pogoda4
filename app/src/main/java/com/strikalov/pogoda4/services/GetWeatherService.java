@@ -1,8 +1,13 @@
 package com.strikalov.pogoda4.services;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -10,11 +15,16 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.strikalov.pogoda4.R;
+import com.strikalov.pogoda4.activities.SearchCityInDataActivity;
 import com.strikalov.pogoda4.constants.SettingsConstants;
+import com.strikalov.pogoda4.databases.SelectedCitiesDatabaseHelper;
+import com.strikalov.pogoda4.models.SelectedCityData;
 import com.strikalov.pogoda4.models.Weather;
 import com.strikalov.pogoda4.models.WeatherPicture;
 import com.strikalov.pogoda4.models.WindDirection;
 import com.strikalov.pogoda4.pojogson.ForecastRequest;
+import com.strikalov.pogoda4.pojogson.GroupTemperatureRequest;
+import com.strikalov.pogoda4.pojogson.TemperatureRequest;
 import com.strikalov.pogoda4.pojogson.WeatherRequest;
 import com.strikalov.pogoda4.interfaces.OpenWeather;
 
@@ -43,6 +53,17 @@ public class GetWeatherService extends Service {
 
     private final String URL_REQUEST = "http://api.openweathermap.org/";
     private final String KEY_API = "e397147f38c213ae53717fb01f417e20";
+    private static final String SQL_EXCEPTION_TAG = "sql_exception";
+
+    private final String tag ="GetWeather";
+
+    //Для обновления базы данных при запросе погоды для одного города
+    private String downloadWeatherCityindex;
+    private String downloadWeatherDate;
+    private String downloadWeatherTemperature;
+
+    //Для группового запроса
+    private ArrayList<SelectedCityData> selectedCityDataList;
 
     private final IBinder binder = new GetWeatherBinder();
 
@@ -52,6 +73,10 @@ public class GetWeatherService extends Service {
 
     public interface DownloadWeatherArrayListListener {
         void onComplete(ArrayList<Weather> weatherArrayList);
+    }
+
+    public interface DownloadTemperatureGroupListener{
+        void onComplete();
     }
 
     public class GetWeatherBinder extends Binder {
@@ -282,9 +307,11 @@ public class GetWeatherService extends Service {
 
     }
 
-    public void downloadWeather(int cityId, DownloadWeatherListener downloadWeatherListener) {
+    public void downloadWeather(String cityIndex, DownloadWeatherListener downloadWeatherListener) {
 
         final DownloadWeatherListener onDownloadWeatherListener = downloadWeatherListener;
+
+        downloadWeatherCityindex = cityIndex;
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URL_REQUEST)
@@ -293,7 +320,7 @@ public class GetWeatherService extends Service {
 
         OpenWeather openWeather = retrofit.create(OpenWeather.class);
 
-        openWeather.loadWeather(cityId, KEY_API)
+        openWeather.loadWeather(cityIndex, KEY_API)
                 .enqueue(new Callback<WeatherRequest>() {
                     final Handler handler = new Handler();
 
@@ -316,7 +343,7 @@ public class GetWeatherService extends Service {
                     @Override
                     public void onFailure(@NonNull Call<WeatherRequest> call,
                                           @NonNull Throwable throwable) {
-                        Log.e("GetWeather", "downloadWeather failed", throwable);
+                        Log.e(tag, "downloadWeather failed", throwable);
                     }
                 });
 
@@ -324,11 +351,158 @@ public class GetWeatherService extends Service {
 
     private void renderOneDayWeather(DownloadWeatherListener downloadWeatherListener, WeatherRequest weatherRequest) {
 
-        downloadWeatherListener.onComplete(weatherRequestRender(weatherRequest));
+        Weather weather = weatherRequestRender(weatherRequest);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        downloadWeatherDate = dateFormat.format(new Date());
+        downloadWeatherTemperature = weather.getTemperature();
+        updateSelectedCityDatabase();
+
+        downloadWeatherListener.onComplete(weather);
 
     }
 
-    public void downloadWeatherArrayList(int cityId,
+    public void downloadTemperatureGroup(ArrayList<SelectedCityData> selectedCityList, final DownloadTemperatureGroupListener downloadTemperatureGroupListener){
+
+        selectedCityDataList = selectedCityList;
+
+        StringBuilder cityIdRequest = new StringBuilder();
+
+        for(SelectedCityData selectedCityData : selectedCityList){
+
+            cityIdRequest.append(selectedCityData.getCityId()).append(",");
+
+        }
+
+        String idsString = cityIdRequest.substring(0, cityIdRequest.length()-1);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL_REQUEST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        OpenWeather openWeather = retrofit.create(OpenWeather.class);
+
+        openWeather.loadGroup(idsString, KEY_API).
+                enqueue(new Callback<GroupTemperatureRequest>() {
+
+                    final Handler handler = new Handler();
+
+                    @Override
+                    public void onResponse(Call<GroupTemperatureRequest> call, final Response<GroupTemperatureRequest> response) {
+
+                        if (response.body() != null) {
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    renderTemperatureGroup(response.body(), downloadTemperatureGroupListener);
+                                }
+                            });
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<GroupTemperatureRequest> call, Throwable t) {
+                        Log.e(tag, "downloadGroup failed", t);
+                    }
+                });
+
+    }
+
+    private void renderTemperatureGroup(GroupTemperatureRequest groupTemperatureRequest, DownloadTemperatureGroupListener downloadTemperatureGroupListener){
+
+        TemperatureRequest[] temperatureRequests = groupTemperatureRequest.getTemperatureRequests();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        String currentDate = dateFormat.format(new Date());
+
+        for(int i=0; i<selectedCityDataList.size(); i++ ){
+
+            SelectedCityData currentsSelectedCityData = selectedCityDataList.get(i);
+
+            String newTemperature = getTemperature(temperatureRequests[i].getMain().getTemp());
+
+            currentsSelectedCityData.setDate(currentDate);
+            currentsSelectedCityData.setTemperature(newTemperature);
+
+        }
+
+        updateSelectedCitiesTemperaturesDatabase(downloadTemperatureGroupListener);
+
+    }
+
+    private void updateSelectedCitiesTemperaturesDatabase(DownloadTemperatureGroupListener downloadTemperatureGroupListener){
+
+        UpdateSelectedCityTemperaturesTask updateSelectedCityTemperaturesTask
+                = new UpdateSelectedCityTemperaturesTask(downloadTemperatureGroupListener);
+        updateSelectedCityTemperaturesTask.execute();
+
+    }
+
+    private class UpdateSelectedCityTemperaturesTask extends AsyncTask<Void, Void, Boolean> {
+
+        private DownloadTemperatureGroupListener downloadTemperatureGroupListener;
+
+        public UpdateSelectedCityTemperaturesTask(DownloadTemperatureGroupListener downloadTemperatureGroupListener){
+
+            this.downloadTemperatureGroupListener = downloadTemperatureGroupListener;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids){
+
+            SQLiteOpenHelper selectedCitiesDatabaseHelper = new SelectedCitiesDatabaseHelper(
+                    getApplicationContext());
+            SQLiteDatabase db = null;
+
+            try{
+
+                db = selectedCitiesDatabaseHelper.getWritableDatabase();
+
+                for(SelectedCityData selectedCityData : selectedCityDataList) {
+
+                    ContentValues selectedCityValues = new ContentValues();
+                    selectedCityValues.put(SelectedCitiesDatabaseHelper.COLUMN_DATE, selectedCityData.getDate());
+                    selectedCityValues.put(SelectedCitiesDatabaseHelper.COLUMN_TEMPERATURE, selectedCityData.getTemperature());
+
+                    db.update(SelectedCitiesDatabaseHelper.TABLE_SELECTED_CITIES, selectedCityValues,
+                            SelectedCitiesDatabaseHelper.COLUMN_CITY_ID + " = ?",
+                            new String[]{selectedCityData.getCityId()});
+
+                }
+
+                return true;
+
+
+            } catch (SQLiteException e) {
+                Log.e(SQL_EXCEPTION_TAG, "Database SelectedCities error", e);
+                return false;
+            } finally {
+                if (db != null) {
+                    db.close();
+                }
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+
+                downloadTemperatureGroupListener.onComplete();
+
+            }
+        }
+
+    }
+
+
+
+    public void downloadWeatherArrayList(String cityIndex,
                                 DownloadWeatherArrayListListener downloadWeatherArrayListListener) {
 
         final DownloadWeatherArrayListListener onDownloadWeatherArrayListListener = downloadWeatherArrayListListener;
@@ -340,7 +514,7 @@ public class GetWeatherService extends Service {
 
         OpenWeather openWeather = retrofit.create(OpenWeather.class);
 
-        openWeather.loadForecast(cityId, KEY_API)
+        openWeather.loadForecast(cityIndex, KEY_API)
                 .enqueue(new Callback<ForecastRequest>() {
 
                     final Handler handler = new Handler();
@@ -366,7 +540,7 @@ public class GetWeatherService extends Service {
                     @Override
                     public void onFailure(@NonNull Call<ForecastRequest> call,
                                           @NonNull Throwable throwable) {
-                        Log.e("GetWeather", "downloadWeatherArrayList failed", throwable);
+                        Log.e(tag, "downloadWeatherArrayList failed", throwable);
                     }
                 });
 
@@ -387,6 +561,51 @@ public class GetWeatherService extends Service {
         }
 
         downloadWeatherArrayListListener.onComplete(weatherArrayList);
+
+    }
+
+    private void updateSelectedCityDatabase(){
+
+        UpdateSelectedCityDatabaseTask updateSelectedCityDatabaseTask = new UpdateSelectedCityDatabaseTask();
+        updateSelectedCityDatabaseTask.execute();
+
+    }
+
+
+    private class UpdateSelectedCityDatabaseTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... voids){
+
+            SQLiteOpenHelper selectedCitiesDatabaseHelper = new SelectedCitiesDatabaseHelper(
+                    getApplicationContext());
+            SQLiteDatabase db = null;
+
+            try{
+
+                db = selectedCitiesDatabaseHelper.getWritableDatabase();
+
+                ContentValues selectedCityValues = new ContentValues();
+                selectedCityValues.put(SelectedCitiesDatabaseHelper.COLUMN_DATE, downloadWeatherDate);
+                selectedCityValues.put(SelectedCitiesDatabaseHelper.COLUMN_TEMPERATURE, downloadWeatherTemperature);
+
+                db.update(SelectedCitiesDatabaseHelper.TABLE_SELECTED_CITIES, selectedCityValues,
+                        SelectedCitiesDatabaseHelper.COLUMN_CITY_ID + " = ?",
+                        new String[]{downloadWeatherCityindex});
+
+                return true;
+
+
+            } catch (SQLiteException e) {
+                Log.e(SQL_EXCEPTION_TAG, "Database SelectedCities error", e);
+                return false;
+            } finally {
+                if (db != null) {
+                    db.close();
+                }
+            }
+
+        }
 
     }
 

@@ -34,7 +34,7 @@ public class SecondActivity extends AppCompatActivity {
 
     private ServiceConnection connection;
     private GetWeatherService service;
-    private boolean bind = false;
+    private boolean bind;
 
     private boolean isGetWeather = false;
     private boolean isOneDayChecked = true;

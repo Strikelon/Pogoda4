@@ -17,11 +17,8 @@ public class SelectedCitiesDatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "selected_cities_database";
     private static final int DB_VERSION = 1;
 
-    private Context context;
-
     public SelectedCitiesDatabaseHelper(Context context){
         super(context, DB_NAME, null, DB_VERSION);
-        this.context = context;
     }
 
     @Override
@@ -32,6 +29,8 @@ public class SelectedCitiesDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_CITY_NAME + " TEXT, "
                 + COLUMN_DATE + " TEXT, "
                 + COLUMN_TEMPERATURE + " TEXT);");
+
+        db.execSQL("CREATE INDEX cityIndexCityId ON " + TABLE_SELECTED_CITIES + " (" + COLUMN_CITY_ID + ");");
 
     }
 

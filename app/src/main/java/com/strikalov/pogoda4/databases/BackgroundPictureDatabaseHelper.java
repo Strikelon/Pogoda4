@@ -37,6 +37,8 @@ public class BackgroundPictureDatabaseHelper  extends SQLiteOpenHelper{
                 + COLUMN_IMAGE_RESOURCE_ID_MINI + " INTEGER, "
                 + COLUMN_SELECTED + " NUMERIC);");
 
+        db.execSQL("CREATE INDEX pictureIndexSelected ON " + TABLE_PICTURE + " (" + COLUMN_SELECTED + ");");
+
         insertPicture(db, resources.getString(R.string.sky), R.drawable.sky_background, R.drawable.sky_background_mini,true);
         insertPicture(db, resources.getString(R.string.forest), R.drawable.forest_background, R.drawable.forest_background_mini,false);
         insertPicture(db, resources.getString(R.string.desert), R.drawable.desert_background, R.drawable.desert_background_mini,false);

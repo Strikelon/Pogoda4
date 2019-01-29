@@ -126,6 +126,16 @@
     <string name="selected_cities_refresh_all">Обновить все</string>
     <string name="selected_cities_add_city">Добавить город</string>
 
+    <string name="find_geo_position">Поиск по геопозиции</string>
+    <string name="city_was_find">Местоположение определено</string>
+    <string name="search_satellite">Идет поиск спутников...</string>
+    <string name="after_satellite_server_connections">Спутник найден. Ожидаем ответ от сервера...</string>
+    <string name="search_satellite_not_available">Определение геолокации в данный момент не доступно.</string>
+    <string name="satellite_no_permission">Предоставьте приложению разрешение на определение геолокации.</string>
+    <string name="ask_geo_message">Для лучшего определения геоданных пожалуйста, включите на устройстве геолокацию.</string>
+    <string name="button_geo_turn_on">Включить</string>
+    <string name="button_geo_no">Нет, спасибо</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

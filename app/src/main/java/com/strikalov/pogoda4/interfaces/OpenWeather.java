@@ -1,6 +1,7 @@
 package com.strikalov.pogoda4.interfaces;
 
 import com.strikalov.pogoda4.pojogson.ForecastRequest;
+import com.strikalov.pogoda4.pojogson.GeoPositionRequest;
 import com.strikalov.pogoda4.pojogson.GroupTemperatureRequest;
 import com.strikalov.pogoda4.pojogson.WeatherRequest;
 
@@ -18,5 +19,8 @@ public interface OpenWeather {
 
     @GET("data/2.5/group")
     Call<GroupTemperatureRequest> loadGroup(@Query("id") String idsString, @Query("appid") String keyApi);
+
+    @GET("data/2.5/weather")
+    Call<GeoPositionRequest> loadFromGeoPosition(@Query("lat") String lat, @Query("lon") String lon, @Query("appid") String keyApi);
 
 }

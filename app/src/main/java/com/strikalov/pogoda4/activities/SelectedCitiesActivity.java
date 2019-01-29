@@ -39,7 +39,7 @@ public class SelectedCitiesActivity extends AppCompatActivity {
 
     private ServiceConnection connection;
     private GetWeatherService service;
-    private boolean bind = false;
+    private boolean bind;
 
     private SharedPreferences sharedPrefMeasureSettings;
 

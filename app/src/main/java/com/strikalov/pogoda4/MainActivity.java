@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.strikalov.pogoda4.activities.AboutDeveloperActivity;
 import com.strikalov.pogoda4.activities.ChangeBackgroundActivity;
 import com.strikalov.pogoda4.activities.FeedbackActivity;
+import com.strikalov.pogoda4.activities.FindGeoPositionActivity;
 import com.strikalov.pogoda4.activities.HumiditySensorActivity;
 import com.strikalov.pogoda4.activities.SearchCityInDataActivity;
 import com.strikalov.pogoda4.activities.SecondActivity;
@@ -118,6 +119,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void onClickShowSearchCityInData(View view){
         Intent intent = new Intent(this, SearchCityInDataActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickStartFindGeoPosition(View view){
+        Intent intent = new Intent(this, FindGeoPositionActivity.class);
         startActivity(intent);
     }
 

@@ -88,6 +88,8 @@
                     android:layout_height="wrap_content"
                     android:drawableStart="@drawable/baseline_search_black_18"
                     android:drawablePadding="4dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:text="@string/city_database_search"
                     android:onClick="onClickShowSearchCityInData"/>
 
@@ -97,7 +99,10 @@
                     android:layout_height="wrap_content"
                     android:drawableStart="@drawable/baseline_room_black_18"
                     android:drawablePadding="4dp"
-                    android:text="@string/city_geo_search"/>
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:text="@string/city_geo_search"
+                    android:onClick="onClickStartFindGeoPosition"/>
 
 
             </LinearLayout>

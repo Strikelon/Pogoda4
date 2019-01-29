@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.ibm.icu.text.Transliterator;
 import com.strikalov.pogoda4.R;
 import com.strikalov.pogoda4.activities.SearchCityInDataActivity;
 import com.strikalov.pogoda4.constants.SettingsConstants;
@@ -23,6 +24,7 @@ import com.strikalov.pogoda4.models.Weather;
 import com.strikalov.pogoda4.models.WeatherPicture;
 import com.strikalov.pogoda4.models.WindDirection;
 import com.strikalov.pogoda4.pojogson.ForecastRequest;
+import com.strikalov.pogoda4.pojogson.GeoPositionRequest;
 import com.strikalov.pogoda4.pojogson.GroupTemperatureRequest;
 import com.strikalov.pogoda4.pojogson.TemperatureRequest;
 import com.strikalov.pogoda4.pojogson.WeatherRequest;
@@ -66,6 +68,10 @@ public class GetWeatherService extends Service {
     private ArrayList<SelectedCityData> selectedCityDataList;
 
     private final IBinder binder = new GetWeatherBinder();
+
+    public interface DownloadCityFromGeoListener{
+        void onComplete(String cityId, String cityName);
+    }
 
     public interface DownloadWeatherListener {
         void onComplete(Weather weather);
@@ -304,6 +310,50 @@ public class GetWeatherService extends Service {
 
         return new Weather(calendar, weatherPicture, tempString, windSpeedString,
                 windDirection, pressureString, humidityString, time);
+
+    }
+
+    public void downloadCityFormGeoPosition(String lat, String lon, DownloadCityFromGeoListener downloadCityFromGeoListener){
+
+        final DownloadCityFromGeoListener onDownloadCityFromGeoListener = downloadCityFromGeoListener;
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL_REQUEST)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        OpenWeather openWeather = retrofit.create(OpenWeather.class);
+
+        openWeather.loadFromGeoPosition(lat, lon, KEY_API)
+                .enqueue(new Callback<GeoPositionRequest>() {
+
+                    final Handler handler = new Handler();
+
+                    @Override
+                    public void onResponse(Call<GeoPositionRequest> call, Response<GeoPositionRequest> response) {
+                        if(response.body() != null){
+                            final GeoPositionRequest geoPositionRequest = response.body();
+
+                            Transliterator transliterator = Transliterator.getInstance("Latin-Russian/BGN");
+
+                            final String cityName = transliterator.transliterate(geoPositionRequest.getCityName());
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    onDownloadCityFromGeoListener.onComplete(
+                                            geoPositionRequest.getCityId(), cityName);
+                                }
+                            });
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<GeoPositionRequest> call, Throwable t) {
+                        Log.e(tag, "downloadFormGeo failed", t);
+                    }
+                });
 
     }
 
